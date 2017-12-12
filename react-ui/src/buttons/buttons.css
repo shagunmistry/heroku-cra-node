@@ -1,0 +1,34 @@
+/*** Like + Challenge + Dislike Buttons **/
+.supportButtons{
+	color: black;
+	font-size: 25px;
+	transition: all 0.2s ease 0s;	
+}
+.supportButtons:hover{
+	border-radius: 10%; 
+	transition: all 0.2s ease 0s;
+	border:1px solid red;
+}
+#button_icon:hover{
+	color: red;
+	transition: all 0.2s ease 0s;		
+}
+/********************************************************Upload Video Card Page***********************/
+.uploadCard{
+	margin-right: auto;
+	margin-left: auto;
+	width: 55rem;
+	background-color: white !important;
+	text-align: left;
+	max-height: 100%;
+}
+#dropZzone{
+	height: 100px !important;
+	width: 100% !important;
+	border: 2px dashed red !important;
+	border-radius: 5%;
+}
+#challengeDescription{
+	max-height: 1000px;
+	max-width: 100%;
+}

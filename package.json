@@ -6,7 +6,9 @@
     "node": "6.11.x"
   },
   "scripts": {
-    "start": "node server",
+    "serverside": "nodemon server",
+    "client": "npm start --prefix react-ui",
+    "dev": "concurrently \"npm run serverside\"  \"npm run client\"",
     "heroku-postbuild": "cd react-ui/ && npm install && npm install --only=dev --no-shrinkwrap && npm run build"
   },
   "cacheDirectories": [
@@ -14,7 +16,12 @@
     "react-ui/node_modules"
   ],
   "dependencies": {
-    "express": "^4.14.1"
+    "concurrently": "^3.5.1",
+    "express": "^4.14.1",
+    "firebase": "^4.8.0",
+    "nodemon": "^1.12.5",
+    "react": "^16.2.0",
+    "react-router-dom": "^4.2.2"
   },
   "repository": {
     "type": "git",

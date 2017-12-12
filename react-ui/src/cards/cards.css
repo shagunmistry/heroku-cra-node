@@ -1,0 +1,62 @@
+.card{
+	transition: 0.5s;
+	box-shadow: none;
+	margin-top: 10px;
+	max-width: 1000px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	margin-right: auto; margin-left: auto;
+}
+.card:hover{
+	border-radius: 10px;
+}
+.card-header{
+	margin-top: 0px;
+	color: red;
+}
+
+#generalCard{
+	width: 525px;
+	max-height: 900px;
+	overflow-y: visible;
+}
+#singleVideoContainer{
+	min-height: 550px;
+	overflow-y: visible;
+	padding: 3px;
+	margin-bottom: 10px;
+	margin-top: 10px;
+	border-radius: 5px;	
+}
+
+
+
+#singleCardProfilePic{
+	height: 100px;
+	width: 85px;
+	border-radius: 40%;
+}
+/**BLOCK_Quote_DESC**/
+blockquote {
+	background:white;
+	border-left: 5px solid red;
+	margin: 2px 2px;
+	padding: 0.5em 10px;
+	quotes: "\201C""\201D""\2018""\2019";
+  }
+  blockquote:before {
+	color: black;
+	content: open-quote;
+	font-size: 4em;
+	line-height: 0.1em;
+	margin-right: 0.25em;
+	vertical-align: -0.4em;
+  }
+  blockquote p {
+	display: inline;
+	color: black;
+  }
+#videoUserName{
+	float: right;
+	font-size: 20px;
+}

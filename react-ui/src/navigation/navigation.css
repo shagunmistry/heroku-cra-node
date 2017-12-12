@@ -1,0 +1,10 @@
+#nav_link{
+    color: red;
+}
+#nav_link:hover{
+    transition: all 0.2s ease-in-out 0s;
+    border-radius: 200px;
+    color: black;
+    background-color: white;
+    border: 0.5px solid red;
+}
