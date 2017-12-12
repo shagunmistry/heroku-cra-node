@@ -52,7 +52,7 @@ export default class Navigationbar extends Component {
             //make sure all LINKS are wrapped in Router
             <Router>
 
-                <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+                <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
                     <a className="navbar-brand" href="Hometrend"><img alt="Logo" src={Keys.navbar_brand} width="30" height="30" /></a>
                     <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavBar" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>

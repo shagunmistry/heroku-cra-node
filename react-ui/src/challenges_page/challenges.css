@@ -1,0 +1,55 @@
+.groupCard{
+	max-height: 100%;	
+	border: 2px solid black;
+	min-width: 500px;
+}
+#challengerRow{
+	background:rgba(20, 255, 255,0.5);
+}
+#challengeVideos{
+	margin: 5px;
+	max-width: 100%;
+}
+#challengerInfo{
+	padding:5px;
+}
+#challengerPic{
+	max-height: 90px;
+	max-width: 100px;
+}
+#challengePicCol{
+	float: left;
+}
+#titleInfoCol{
+	font-size: 15px;
+}
+
+#videoDescChallengePage{
+	background: rgba(255, 255, 255, 0.5);
+	font-size: 20px;
+}
+#challengerHitDiv{
+	padding: 0px;
+}
+
+/********* HEART BUTTON ************/
+.heartButton{
+	color: black;
+	cursor: pointer;
+	font-size: 30px;
+	border-radius: 20%;
+	max-width: 120px;
+	height: 100%;
+	max-height: 100px;
+	background: white;
+	border: 0.5px solid black;
+	color: red;
+}
+.heartButton:hover{
+	border:1px solid red;
+	box-shadow: 2px 2px 2px black;
+	color: black;
+}
+.hitNumber{
+	font-size: 20px;
+}

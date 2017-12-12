@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import Navigationbar from '../navigation/Navigation';
 import Hometrend from '../homepage/Hometrend';
-
+import OngoingChallenges from '../challenges_page/OngoingChallenges';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 
@@ -44,6 +44,7 @@ class App extends Component {
           <div>
             <Route exact path="/" component={Hometrend} />
             <Route exact path="/Hometrend" component={Hometrend} />
+            <Route exact path="/trending-Challenges" component={OngoingChallenges} />
           </div>
         </Router>
       </div>
