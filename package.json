@@ -6,6 +6,7 @@
     "node": "6.11.x"
   },
   "scripts": {
+    "start": "node server",
     "serverside": "nodemon server",
     "client": "npm start --prefix react-ui",
     "dev": "concurrently \"npm run serverside\"  \"npm run client\"",
