@@ -4,7 +4,7 @@
 
 import React, { Component } from 'react';
 import ChallengeCard from './ChallengeCard';
-import { firebaseApp } from '../firebase/Firebase';
+import firebaseApp from '../firebase/Firebase';
 
 var databaseRef = firebaseApp.database();
 var userInfo = {}, hitsInfo = {}, hitsArray = [];

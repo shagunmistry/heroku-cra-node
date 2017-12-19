@@ -10,13 +10,14 @@
  * --Note from old file:  In the LIKE method, make sure that the .SET is not interfering with the CHALLENGE DATA set. 
  */
 import React, { Component } from 'react';
-import { firebaseApp } from '../firebase/Firebase';
+import firebaseApp from '../firebase/Firebase';
 import Dropzone from 'react-dropzone';
 import './buttons.css';
 
-var defStorageRef = firebaseApp.storage().ref(), databaseRef = firebaseApp.database(),
+var defStorageRef = firebaseApp.storage().ref(),
     //this firebase is required for upload process. 
     firebase = require('firebase');
+var databaseRef = firebaseApp.database();
 
 var Modal = require('boron/ScaleModal');
 var modalStyle = {

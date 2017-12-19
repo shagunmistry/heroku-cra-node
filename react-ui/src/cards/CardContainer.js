@@ -5,7 +5,7 @@
  * Prop: CUSTOMIZE is for when you are calling this page to display either a specific user's profile page or specific category. 
  */
 import React, { Component } from 'react';
-import { firebaseApp } from '../firebase/Firebase';
+import firebaseApp from '../firebase/Firebase';
 import SingleCardContainer from './SingleCardContainer';
 
 var dataRef = firebaseApp.database();

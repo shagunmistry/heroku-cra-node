@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Link } from 'react-router-dom';
-import { firebaseApp } from '../firebase/Firebase';
+import { BrowserRouter as Router } from 'react-router-dom';
+import firebaseApp from '../firebase/Firebase';
 import Keys from '../Pictures/Pic_Keys';
 import './navigation.css';
 
@@ -61,32 +61,30 @@ export default class Navigationbar extends Component {
                     <div className="collapse navbar-collapse" id="myNavBar">
                         <ul className="navbar-nav mr-auto">
                             <li className="nav-item">
-                                <Link id="nav_link" className="nav-link" to="/Hometrend" ><i className="fa fa-home"></i> Home </Link>
+                                <a id="nav_link" className="nav-link" href="/Hometrend" ><i className="fa fa-home"></i> Home </a>
                             </li>
                             <li className="nav-item" >
-                                <Link className="nav-link" id="nav_link" to="/OngoingChallenges">
-                                    <i className="fas fa-chart-bar"></i> Ongoing Challenges</Link>
+                                <a className="nav-link" id="nav_link" href="/trending-challenges">
+                                    <i className="fas fa-chart-bar"></i> Ongoing Challenges</a>
                             </li>
                             <li className="nav-item">
-                                <Link to="/UploadVideo" id="nav_link" className="nav-link">
-                                    <i className="fa fa-upload"></i><span> Upload Video</span></Link>
+                                <a href="/UploadVideo" id="nav_link" className="nav-link">
+                                    <i className="fa fa-upload"></i><span> Upload Video</span></a>
                             </li>
                             <li className="nav-item">
-                                <Link to="/ProfileCheck" id="nav_link" className="nav-link">
+                                <a href="/check_user_status" id="nav_link" className="nav-link">
                                     <i className="fa fa-user" ></i> Profile {/*<span className="badge notifications">0</span> */}
-                                </Link>
+                                </a>
                             </li>
                             <li className="nav-item dropdown" id="profile_options">
                                 <a className="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i className="fa fa-id-badge"></i>
                                 </a>
                                 <div className="dropdown-menu" aria-labelledby="navbarDropdown" id="profile_options_btns">
-                                    <li><button id="logOutButton" className="dropdown-item btn btn-info btn-4"
+                                    <button id="logOutButton" className="dropdown-item btn btn-info btn-4"
                                         type="button" onClick={() => this.logOut()}>Log Out</button>
-                                    </li>
-                                    <li><button id="editButton" className="dropdown-item btn btn-info"
+                                    <button id="editButton" className="dropdown-item btn btn-info"
                                         type="button" onClick={() => this.editProfie()}>Edit Profile </button>
-                                    </li>
                                 </div>
                             </li>
                         </ul>

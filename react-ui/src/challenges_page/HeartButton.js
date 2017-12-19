@@ -7,7 +7,7 @@
 import React, { Component } from 'react';
 import Modal from 'boron/WaveModal';
 
-import { firebaseApp } from '../firebase/Firebase';
+import firebaseApp from '../firebase/Firebase';
 var databaseRef = firebaseApp.database();
 
 class HeartButton extends Component {
@@ -116,11 +116,11 @@ class HeartButton extends Component {
 
     }
 
-     /**
-     * Method: 
-     * - Once they click the heart button, increment/decrement the counter based on whether or not they have hearted it before, 
-     * - Also, if 
-     */
+    /**
+    * Method: 
+    * - Once they click the heart button, increment/decrement the counter based on whether or not they have hearted it before, 
+    * - Also, if 
+    */
     heartButton() {
         var referThis = this,
             challengedUniqueKey = referThis.props.challengedUniqueKey,
@@ -158,9 +158,9 @@ class HeartButton extends Component {
                     challengedUpdates['statKeeper/' + this.state.activeUserId + '/' + challengedUniqueKey + '/hearted'] = true;
                     //Set the Challenger's status to false so that if they have HEARTED that one before, it dis-hearts it 
                     challengedUpdates['statKeeper/' + this.state.activeUserId + '/' + challengerUniqueKey + '/hearted'] = false;
-                    
+
                     //Check if they have hearted the Challenger's video as wel
-                    if(this.state.challengerHearted){
+                    if (this.state.challengerHearted) {
                         //Decrement that
                         challengedUpdates['challenges/' + challengedUniqueKey + '/' + challengeruserid + '/challengerHits'] = this.state.challengerHits - 1;
                     }
@@ -198,7 +198,7 @@ class HeartButton extends Component {
                     challengerUpdates['statKeeper/' + this.state.activeUserId + '/' + challengedUniqueKey + '/hearted'] = false;
 
                     //Check if they have hearted CHALLENGED vid before
-                    if(this.state.challengedHearted){
+                    if (this.state.challengedHearted) {
                         //Decrement that
                         challengerUpdates['challenges/' + challengedUniqueKey + '/' + challengeruserid + '/challengedHits'] = this.state.challengedHits - 1;
                     }

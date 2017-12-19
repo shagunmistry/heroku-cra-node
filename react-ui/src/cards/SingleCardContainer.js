@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Player } from 'video-react';
 import { Link } from 'react-router-dom';
-import { firebaseApp } from '../firebase/Firebase';
+import firebaseApp from '../firebase/Firebase';
 import SocialButtonComponent from '../buttons/SocialButtonComponent';
 import './cards.css';
 import '../../node_modules/video-react/dist/video-react.css';
@@ -79,7 +79,7 @@ class SingleCardContainer extends Component {
                                 </div>
                                 <div className="row">
                                     <div className="col-md-4 col-xs-6 col-sm-4">
-                                        <Link to={`/users/${userid}`} >
+                                        <Link to={`/users/${userName}`} >
                                             <img src={profilePic} alt="Profile Pic" id="singleCardProfilePic" />
                                         </Link>
                                     </div>

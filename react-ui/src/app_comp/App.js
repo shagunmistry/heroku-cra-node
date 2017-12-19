@@ -3,6 +3,8 @@ import './App.css';
 import Navigationbar from '../navigation/Navigation';
 import Hometrend from '../homepage/Hometrend';
 import OngoingChallenges from '../challenges_page/OngoingChallenges';
+import ProfileCheck from '../profile_page_comp/ProfileCheck';
+import Profilepage from '../profile_page_comp/Profile_page';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 
@@ -36,15 +38,17 @@ class App extends Component {
   } */
 
   render() {
+
     return (
       <div className="App">
         <Navigationbar />
-
         <Router>
           <div>
             <Route exact path="/" component={Hometrend} />
             <Route exact path="/Hometrend" component={Hometrend} />
-            <Route exact path="/trending-Challenges" component={OngoingChallenges} />
+            <Route exact path="/trending-challenges" component={OngoingChallenges} />
+            <Route exact path="/check_user_status" component={ProfileCheck} />
+            <Route path="/users/:userName" component={Profilepage}/>
           </div>
         </Router>
       </div>
