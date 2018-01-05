@@ -18,6 +18,7 @@ class ChallengeCard extends Component {
         const { challengeduserName, challengedvideoDesc,
             challengedvideoURL, challengerUniqueKey, challengeruserName,
             challengervideoDesc, challengervideoURL, } = this.props;
+            
         return (
             <div>
                 <div className="container">

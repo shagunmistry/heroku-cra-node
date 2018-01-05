@@ -13,66 +13,63 @@ import React, { Component } from 'react';
 import Profilecard from './Profilecard';
 import firebaseApp from '../firebase/Firebase';
 import CardContainer from '../cards/CardContainer';
+require('firebase/firestore');
+var firebase = require('firebase');
 
-const database = firebaseApp.database();
+//const database = firebaseApp.database();
 var userid;
+
+var db = firebase.firestore();
 
 class Profilepage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            visitorTag: true,
-            visitorId: ''
+            visitorBoolean: true,
+            visitorNickname: '',
+            profileNickname: ''
         }
     }
 
-    /**
-   * Check if the userId in the link is the same as the currently logged in user id
-   * If TRUE: 
-   *      Show the logout button and Edit Profile button
-   * ELSE: 
-   *      Don't display the buttons and show stats and other visitor stuff. 
-   */
-    componentWillMount() {
+    componentDidMount() {
         var referThis = this;
+        let profileNickname = this.props.match.params.nickname || '';
+
         firebaseApp.auth().onAuthStateChanged(function (user) {
             //If the user is logged in, see if the prop id matches that.
             if (user) {
-                //check if the user exists first. If not, send him to the Edit page. 
-                database.ref('users/').child(user.uid).on('value', function (snapshot) {
-                    if (snapshot.val() !== null) {
-                        //User exists so do nothing. 
+                const userRef = db.collection('users').doc(user.email);
+                userRef.get().then(function (doc) {
+
+                    if (doc && doc.exists) {
+                        //Compare the nickname to the active user's nickname 
+
+                        if (doc.data().nickname === profileNickname) {
+                            //Not a visitor 
+                            referThis.setState({
+                                visitorBoolean: false,
+                                profileNickname: doc.data().nickname
+                            });
+                        } else {
+                            //Is a visitor
+                            referThis.setState({
+                                profileNickname: profileNickname,
+                                visitorBoolean: true,
+                                visitorNickname: doc.data().nickname
+                            });
+                        }
                     } else {
-                        //User is not in the database so lead them to the Profile Page. 
+                        //User has not been registered correctly so send them to the editProfile page.
+                        window.alert("Please update your profile first");
                         window.location.replace('/EditProfile');
                     }
                 });
-                //if the userid was passed in the link. 
-                if (!referThis.props.customize) {
-                    //  console.log(user.uid + " " + referThis.props.match.params.userId);
-                    // console.log(user.uid === referThis.props.match.params.userId);
-                    if (user.uid === referThis.props.match.params.userId) {
-                        //visiting own profile
-                        referThis.setState({ visitorTag: false });
-                    } else {
-                        referThis.setState({ visitorTag: true, visitorId: user.uid });
-                    }
-                } else {
-                    //if the user id was passed in the props
-                    //If the user is visiting his own profile
-                    //   console.log("No Customization: " + user.uid + " " + referThis.props.uid);
-                    //  console.log("No Customization : " + user.uid === referThis.props.uid);
-                    if (user.uid === referThis.props.uid) {
-                        //visiting own profile
-                        referThis.setState({ visitorTag: false });
-                    } else {
-                        referThis.setState({ visitorTag: true, visitorId: user.uid });
-                    }
-                }
+
+
             } else {
                 //there is no user logged in so visitor tag is automatically true. 
                 referThis.setState({
-                    visitorTag: true, visitorId: ""
+                    visitorBoolean: true, visitorNickname: ""
                 });
             }
         });
@@ -80,10 +77,21 @@ class Profilepage extends Component {
 
     render() {
 
+        if (this.state.visitorBoolean) {
+            if (this.state.visitorNickname === '') {
+                return (
+                    <div className="container">
+                        <i id="loading_icon" className="fas fa-code"></i>
+                    </div>
+                );
+            }
+        }
         return (
             <div>
-                <Profilecard userId={userid} visitorTag={this.state.visitorTag} visitorId={this.state.visitorId} />
-                <CardContainer userId={userid} customize={true} visitorTag={this.state.visitorTag} />
+                <Profilecard profileNickname={this.state.profileNickname}
+                    visitorBoolean={this.state.visitorBoolean} visitorNickname={this.state.visitorNickname} />
+                <CardContainer userId={userid} customize={true} visitorBoolean={this.state.visitorBoolean} visitorNickname={this.state.visitorNickname}
+                />
             </div>
         );
     }

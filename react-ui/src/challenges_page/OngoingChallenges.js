@@ -95,12 +95,17 @@ class OngoingChallenges extends Component {
 
         var arrayToPass = this.state.arrayOfChallengeData;
         return (
-            <div>
+         /*   <div>
                 {
                     arrayToPass.map((data, i) => <ChallengeCard {...data} key={data.challengerUniqueKey + i}
                         hitsInformation={hitsArray[i]}
                     />)
                 }
+            </div> */
+            <div>
+                <div className="card">
+                    <h3> Coming Soon.... </h3>
+                </div>
             </div>
         )
 

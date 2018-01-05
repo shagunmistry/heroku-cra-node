@@ -5,8 +5,10 @@ import firebaseApp from '../firebase/Firebase';
 import SocialButtonComponent from '../buttons/SocialButtonComponent';
 import './cards.css';
 import '../../node_modules/video-react/dist/video-react.css';
+require('firebase/firestore');
 
-var databaseRef = firebaseApp.database();
+var firebase = require('firebase');
+var db = firebase.firestore();
 
 class SingleCardContainer extends Component {
     constructor(props) {
@@ -18,8 +20,13 @@ class SingleCardContainer extends Component {
             dislike: false,
             challenge: false,
             activeProfilePic: "",
-            activeUserName: ""
-        })
+            activeUserName: "",
+            activeUserEmail: "",
+            activeNickname: "",
+            profilePicURL: "",
+        });
+
+        this.loadProfilePic = this.loadProfilePic.bind(this);
     }
 
     /**
@@ -27,27 +34,48 @@ class SingleCardContainer extends Component {
      */
     componentWillMount() {
         var referThis = this;
+        //Load the profile pic 
+        this.loadProfilePic();
+
         firebaseApp.auth().onAuthStateChanged(function (user) {
             if (user) {
-                var activeUserid = user.uid;
-                databaseRef.ref('/users/' + activeUserid).on('value', function (snapshot) {
+                const activeProfileRef = db.collection('users').doc(user.email);
+                activeProfileRef.get().then(function (activeSnapshot) {
+                    console.log(activeSnapshot.data().nickname);
                     referThis.setState({
-                        activeProfilePic: snapshot.val().profile_picture,
+                        activeProfilePic: activeSnapshot.data().profilePic,
                         activeUser: true,
-                        activeUserID: activeUserid,
-                        activeUserName: snapshot.val().username
+                        activeUserID: user.uid,
+                        activeUserName: activeSnapshot.data().userName,
+                        activeNickname: activeSnapshot.data().nickname,
+                        activeUserEmail: user.email
                     });
                 });
             } else {
                 referThis.setState({
                     activeUser: false
-                })
+                });
             }
         });
     }
+
+    /**
+     * Load the user's profile Picture.
+     */
+    loadProfilePic() {
+        let referThis = this;
+        //Use the user's email to access their profile pic info. 
+        const prof_ref = db.collection('users').doc(this.props.email);
+        prof_ref.get().then(function (querySnap) {
+            referThis.setState({
+                profilePicURL: querySnap.data().profilePic
+            });
+        });
+    }
+
     render() {
         //Get all the props passed in. 
-        const { userid, profilePic, /*videoCategory,*/ videoDesc, videoTitle, videoURL, userName, uniqueKey } = this.props;
+        const { videoURL, videoDesc, videoTitle, /*likes, dislikes,*/ nickname, /*challenges, tagged*/ } = this.props;
         return (
             <div className="container">
                 <div className="card" id="generalCard">
@@ -56,36 +84,39 @@ class SingleCardContainer extends Component {
                             <h3>{videoTitle}</h3>
                             <Player poster="" src={videoURL}></Player>
                             <div style={{ margin: '3px' }}>
-                                <div className="row" id="buttonContainerRow">
-                                    <div className="col-md-4 col-xs-6 col-sm-4">
+                                <div className="row sectin group" id="buttonContainerRow">
+                                    <div className="col span_1_of_3" id='social_button_box'>
                                         <SocialButtonComponent buttonType="like"
                                             activeUserID={this.state.activeUserID} activeUser={this.state.activeUser}
-                                            userid={userid}
-                                            uniqueKey={uniqueKey} />
+                                            activeUserEmail={this.state.activeUserEmail} activeNickname={this.state.activeNickname}
+                                            videoID={this.props.videoID} uploaderNickname={this.props.nickname} eachKey={this.props.eachKey}
+                                        />
                                     </div>
-                                    <div className="col-md-4 col-xs-6 col-sm-4">
+                                    <div className="col span_2_of_3" id='social_button_box'>
                                         <SocialButtonComponent buttonType="challenge"
                                             activeUserID={this.state.activeUserID} activeUser={this.state.activeUser}
-                                            userid={userid}
-                                            uniqueKey={uniqueKey} profilePicURL={this.state.activeProfilePic}
-                                            activeUserName={this.state.activeUserName} />
+                                            profilePicURL={this.state.activeProfilePic} activeUserEmail={this.state.activeUserEmail}
+                                            activeUserName={this.state.activeUserName} activeNickname={this.state.activeNickname}
+                                            videoID={this.props.videoID} uploaderNickname={this.props.nickname} eachKey={this.props.eachKey}
+                                        />
                                     </div>
-                                    <div className="col-md-4 col-xs-6 col-sm-4">
+                                    <div className="col span_3_of_3" id='social_button_box'>
                                         <SocialButtonComponent buttonType="dislike"
                                             activeUserID={this.state.activeUserID} activeUser={this.state.activeUser}
-                                            userid={userid}
-                                            uniqueKey={uniqueKey} />
+                                            activeUserEmail={this.state.activeUserEmail} activeNickname={this.state.activeNickname}
+                                            videoID={this.props.videoID} uploaderNickname={this.props.nickname} eachKey={this.props.eachKey}
+                                        />
                                     </div>
                                 </div>
                                 <div className="row">
-                                    <div className="col-md-4 col-xs-6 col-sm-4">
-                                        <Link to={`/users/${userName}`} >
-                                            <img src={profilePic} alt="Profile Pic" id="singleCardProfilePic" />
+                                    <div className="col-md-3">
+                                        <Link to={`/users/${nickname}`} >
+                                            <img alt={nickname} id="singleCardProfilePic" src={this.state.profilePicURL} />
                                         </Link>
                                     </div>
-                                    <div className="col-md-8 col-xs-12 col-sm-8">
+                                    <div className="col-md-9">
                                         <blockquote><p>{videoDesc}</p></blockquote>
-                                        <p id="videoUserName">-{userName}</p>
+                                        <p id="videoUserName">By {nickname}</p>
                                     </div>
                                 </div>
                             </div>

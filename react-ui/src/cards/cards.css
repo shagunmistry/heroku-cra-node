@@ -19,6 +19,7 @@
 	width: 525px;
 	max-height: 900px;
 	overflow-y: visible;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 #singleVideoContainer{
 	min-height: 550px;
@@ -39,18 +40,10 @@
 /**BLOCK_Quote_DESC**/
 blockquote {
 	background:white;
-	border-left: 5px solid red;
-	margin: 2px 2px;
-	padding: 0.5em 10px;
-	quotes: "\201C""\201D""\2018""\2019";
-  }
-  blockquote:before {
-	color: black;
-	content: open-quote;
-	font-size: 4em;
-	line-height: 0.1em;
-	margin-right: 0.25em;
-	vertical-align: -0.4em;
+	border-left: 2px solid red;
+	padding: 0.5em;
+	background-color: lightgray;
+	box-shadow:  0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   }
   blockquote p {
 	display: inline;
@@ -58,5 +51,43 @@ blockquote {
   }
 #videoUserName{
 	float: right;
-	font-size: 20px;
+	font-size: 15px;
+}
+
+
+/**************** New Column Settings for the social like buttons *************/
+/*  SECTIONS  */
+.section {
+	clear: both;
+	padding: 0px;
+	margin: 0px;
+}
+
+/*  COLUMN SETUP  */
+.col {
+	display: block;
+	float:left;
+	margin: 1% 0 1% 1.6%;
+}
+.col:first-child { margin-left: 0; }
+
+/*  GROUPING  */
+.group:before,
+.group:after { content:""; display:table; }
+.group:after { clear:both;}
+.group { zoom:1; /* For IE 6/7 */ }
+
+/*  GRID OF THREE  */
+.span_3_of_3 { width: 100%; }
+.span_2_of_3 { width: 66.13%; }
+.span_1_of_3 { width: 32.26%; }
+
+/*  GO FULL WIDTH BELOW 480 PIXELS */
+@media only screen and (max-width: 480px) {
+	.col {  margin: 1% 0 1% 0%; }
+	.span_3_of_3, .span_2_of_3, .span_1_of_3 { width: 100%; }
+}
+
+#social_button_box:hover{
+	box-shadow: 0 3px 0px rgba(0, 0, 0, 0.3);
 }

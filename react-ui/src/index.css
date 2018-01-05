@@ -1,3 +1,8 @@
+*{
+  transition-property: all;
+	transition-duration: 100ms;
+	transition-timing-function: ease-out;
+}
 body {
   margin: 0;
   padding: 0;

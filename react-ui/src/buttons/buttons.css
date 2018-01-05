@@ -7,7 +7,6 @@
 .supportButtons:hover{
 	border-radius: 10%; 
 	transition: all 0.2s ease 0s;
-	border:1px solid red;
 }
 #button_icon:hover{
 	color: red;
@@ -25,7 +24,7 @@
 #dropZzone{
 	height: 100px !important;
 	width: 100% !important;
-	border: 2px dashed red !important;
+	border: 1px solid red !important;
 	border-radius: 5%;
 }
 #challengeDescription{

@@ -8,8 +8,7 @@
 #profile_card{
 	margin-right: auto;
 	margin-left: auto;
-    border: 1px solid red;
-    box-shadow:2px 2px 7px black;
+    box-shadow:2px 2px 7px lightgray;
 	max-width: 800px;
     background-color: white;    
 }
@@ -37,5 +36,24 @@
     }
     .option_buttons{
         margin: 2px;
+    }
+}
+
+
+#loading_icon {
+    margin-top: 10%;  
+    -webkit-animation: rotation 2s infinite linear;
+    color: red;
+    font-size: 2em;
+    border-radius: 10%;
+    border: 1px solid red;
+}
+
+@-webkit-keyframes rotation {
+    from {
+            -webkit-transform: rotate(0deg);
+    }
+    to {
+            -webkit-transform: rotate(359deg);
     }
 }

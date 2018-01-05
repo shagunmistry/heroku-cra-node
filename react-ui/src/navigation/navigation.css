@@ -1,10 +1,27 @@
+#main_nav{
+    background-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+}
+#navbar_toggler{
+    transform: rotate(90deg);
+}
+#navbar_toggler:hover{
+    color: red;
+    transform: rotate(0deg);
+}
+
 #nav_link{
     color: red;
 }
 #nav_link:hover{
-    transition: all 0.2s ease-in-out 0s;
     border-radius: 200px;
     color: black;
     background-color: white;
     border: 0.5px solid red;
+}
+
+@media only screen and (max-width: 990px){
+    #search_box{
+        justify-content: center;
+    }
 }

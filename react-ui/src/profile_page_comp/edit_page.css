@@ -1,0 +1,50 @@
+#edit_card{
+    min-width: 400px;
+}
+#picUploadZone{
+    max-width: 100px;
+    max-height: 100px;
+}
+#profile_picture{
+    max-height: 200px;
+    max-width: 200px;
+	border-radius: 5%;
+	padding-left: 10px;
+}
+form{
+    padding: 5px;
+}
+
+.editAboutCard{
+	width: 700px;
+	max-height: 100%;
+    background-color: white;
+}
+#editCardBlock{
+	text-align: left;
+}
+#userName{
+	font-size: 25px;
+	text-align: left;
+	margin: 1px;
+}
+
+#facebookLinkInput{
+	background-color: #3b5998;
+	color:white;
+}
+#linkedInLinkInput{
+	background-color:#007bb6;
+	color:white;
+}
+#twitterLinkInput{
+	background-color: #0084b4;
+	color:white;
+}
+#picUploadZone{
+	max-width: 200px;
+	max-height: 30px;
+	padding: 1px 12px;
+	float: right;
+	color: green;
+}

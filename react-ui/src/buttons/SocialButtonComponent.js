@@ -1,23 +1,19 @@
-/**
- * Buttons: Like + Dislike + Challenge 
- * Props :
- * buttonType="like" || "dislike" || "challenge"
- * activeUserID 
- * activeUser
- * userid
- * uniqueKey
- * 
- * --Note from old file:  In the LIKE method, make sure that the .SET is not interfering with the CHALLENGE DATA set. 
+/** 
+ * Path: stats -> email -> videoTitle (modified) -> socialNumbers --> like, dislike, challenge 
  */
 import React, { Component } from 'react';
 import firebaseApp from '../firebase/Firebase';
 import Dropzone from 'react-dropzone';
+import { Player } from 'video-react';
 import './buttons.css';
 
-var defStorageRef = firebaseApp.storage().ref(),
-    //this firebase is required for upload process. 
-    firebase = require('firebase');
-var databaseRef = firebaseApp.database();
+require('firebase/firestore');
+var firebase = require('firebase');
+var db = firebase.firestore();
+
+var storageRef = firebaseApp.storage().ref(), databaseRef = firebaseApp.database();
+
+
 
 var Modal = require('boron/ScaleModal');
 var modalStyle = {
@@ -33,6 +29,9 @@ class SocialButtonComponent extends Component {
             dislikes: 0,
             challenges: 0,
             filesToBeSent: [],
+            likedBefore: false,
+            dislikedBefore: false,
+            temp_video: ''
         });
         this.likeButton = this.likeButton.bind(this);
         this.dislikeButton = this.dislikeButton.bind(this);
@@ -47,44 +46,32 @@ class SocialButtonComponent extends Component {
         this.onDrop = this.onDrop.bind(this);
     }
 
-    /**
- * 
- */
     componentDidMount() {
         var key = this.props.uniqueKey, referThis = this;
 
         //Go to the database under STATS/ and use the key to get all the information. 
-        var statRef = databaseRef.ref('stats/' + key);
-        statRef.on('value', function (snapshot) {
-            if (snapshot.exists()) {
-                var dataLikes = snapshot.val().likes;
-                var dataDislikes = snapshot.val().dislikes;
-                var dataChallenges = snapshot.val().challenges;
+        const getStatsRef = db.collection('all_videos').doc(this.props.videoID);
+        getStatsRef.onSnapshot(function (doc) {
+            if (doc && doc.exists) {
                 referThis.setState({
-                    likes: dataLikes,
-                    dislikes: dataDislikes,
-                    challenges: dataChallenges,
+                    likes: doc.data().likes,
+                    dislikes: doc.data().dislikes,
+                    challenges: doc.data().challenges,
                 });
-            } else {
-                //It does not exists so do nothing.
-                console.log("Returning NULL for this key: " + key);
             }
-
         });
 
         //See if there is an active user, then color the social support buttons, Else.DONT!
         firebaseApp.auth().onAuthStateChanged(function (user) {
             if (user) {
-                //ID of the buttons = userid+uniquekey        
+                var dislikeBtnID = document.getElementById(referThis.props.activeUserID + referThis.props.eachKey + 'dislike');
+                var likeBtn = document.getElementById(referThis.props.activeUserID + referThis.props.eachKey + 'like');
+                //ID of the buttons = userid+activeNickname        
                 //Find out if the user has liked/disliked it before and then change the color
-                databaseRef.ref('statKeeper/' + referThis.props.userid + '/' + key).on('value', function (snapshot) {
-                    var dislikeBtnID = document.getElementById(referThis.props.userid + referThis.props.uniqueKey + 'dislike');
-                    var likeBtn = document.getElementById(referThis.props.userid + referThis.props.uniqueKey + 'like');
-
-                    if (snapshot.exists()) {
-                        //If the user has interacted with the like/dislike feature of this video before: continue
-                        if (snapshot.val().like) {
-                            //if the user has liked it
+                const activeStatRef = db.collection('stats').doc(user.email).collection(referThis.props.videoID).doc('socialNumbers');
+                activeStatRef.onSnapshot(function (snapshot) {
+                    if (snapshot && snapshot.exists) {
+                        if (snapshot.data().like) {
                             likeBtn.style.backgroundColor = "white";
                             likeBtn.style.color = "red";
                             likeBtn.style.border = "none";
@@ -92,8 +79,7 @@ class SocialButtonComponent extends Component {
                             likeBtn.style.backgroundColor = "transparent";
                             likeBtn.style.color = "black";
                         }
-
-                        if (snapshot.val().dislike) {
+                        if (snapshot.data().dislike) {
                             //if the user has disliked the video then do the same
                             dislikeBtnID.style.backgroundColor = "white";
                             dislikeBtnID.style.color = "red";
@@ -103,55 +89,101 @@ class SocialButtonComponent extends Component {
                             dislikeBtnID.style.color = "black";
                         }
                     }
-
                 });
             }
         });
-
-
     }
 
     /**
      * - Like the video based on whether or not they have liked it before or disliked it before. 
-     * @param {*} uniqueKey 
      */
-    likeButton(uniqueKey) {
-        var originalLikes, referThis = this, updates = {};
+    likeButton() {
+        var originalLikes = this.state.likes, originalDislikes = this.state.dislikes, referThis = this;
         //User has logged in.
         if (this.props.activeUser) {
+            //Make the boolean true
+            //Decide if the user already liked or not before. 
+            const activeStatRef = db.collection('stats').doc(this.props.activeUserEmail)
+                .collection(referThis.props.videoID).doc('socialNumbers');
 
-            //Get the original like number
-            originalLikes = this.state.likes;
-            var originalDislikes = this.state.dislikes;
+            activeStatRef.get().then(function (snapshot) {
+                if (snapshot && snapshot.exists) {
+                    if (snapshot.data().dislike) {
+                        //User has disliekd the video before so decrement that counter 
+                        referThis.setState({
+                            dislikedBefore: true
+                        });
+                    }
+                    if (snapshot.data().like) {
+                        //User already likes it so decrement the counter
+                        //decrement the counter first under videos and then under all_videos 
+                        let all_videosRef = db.collection('all_videos').doc(referThis.props.videoID);
+                        all_videosRef.set({
+                            likes: originalLikes - 1
+                        }, { merge: true }).then(function () {
+                            let videos_ref = db.collection('videos').doc(referThis.props.uploaderNickname)
+                                .collection(referThis.props.videoID).doc('video_info');
+                            videos_ref.set({
+                                likes: originalLikes - 1
+                            }, { merge: true });
+                        });
 
-            //Check if the user has liked it before
-            var checkStatRef = databaseRef.ref('statKeeper/' + referThis.props.userid + '/' + uniqueKey);
-            checkStatRef.once('value').then(function (snapshot) {
-                console.log(snapshot.val());
-                if (!snapshot.exists() || !(snapshot.val().like)) {
-                    //If the user has not liked it before set LIKE to true and dislike to false
-                    updates['statKeeper/' + referThis.props.userid + '/' + uniqueKey + '/like'] = true;
-                    updates['statKeeper/' + referThis.props.userid + '/' + uniqueKey + '/dislike'] = false;
-                    updates['stats/' + uniqueKey + '/likes'] = originalLikes + 1;
-                    databaseRef.ref().update(updates);
-                    //If the user has DISLIKED it before, then un-dislike it
-                    if (!snapshot.exists() || snapshot.val().dislike) {
-                        updates['stats/' + uniqueKey + '/dislikes'] = originalDislikes - 1;
-                        databaseRef.ref().update(updates);
+                        //Set the boolean to false. 
+                        activeStatRef.set({
+                            like: false,
+                        }, { merge: true });
+
+                    } else {
+                        //user has not liked it before so increment the counter 
+                        let all_videosRef = db.collection('all_videos').doc(referThis.props.videoID);
+                        if (referThis.state.dislikedBefore) {
+                            originalDislikes -= 1;
+                        }
+
+                        all_videosRef.set({
+                            likes: originalLikes + 1,
+                            dislikes: originalDislikes
+                        }, { merge: true }).then(function () {
+                            let videos_ref = db.collection('videos').doc(referThis.props.uploaderNickname)
+                                .collection(referThis.props.videoID).doc('video_info');
+                            videos_ref.set({
+                                likes: originalLikes + 1,
+                                dislikes: originalDislikes
+                            }, { merge: true });
+                        });
+                        //Set the boolean to false. 
+                        activeStatRef.set({
+                            like: true,
+                            dislike: false
+                        }, { merge: true });
+                    }
+                } else {
+                    //user has never liked it before
+                    let all_videosRef = db.collection('all_videos').doc(referThis.props.videoID);
+                    //the user has liked it pre
+                    if (referThis.state.dislikedBefore) {
+                        originalDislikes -= 1;
                     }
 
-                    // console.log("A: " + snapshot.exists());
-                } else if (snapshot.val().like) {
-                    //if the user has liked it before, then set the like to false, dislike to true, and increment the dislike #
-                    updates['statKeeper/' + referThis.props.userid + '/' + uniqueKey + '/like'] = false;
-                    updates['stats/' + uniqueKey + '/likes'] = originalLikes - 1;
+                    all_videosRef.set({
+                        likes: originalLikes + 1,
+                        dislikes: originalDislikes
+                    }, { merge: true }).then(function () {
+                        let videos_ref = db.collection('videos').doc(referThis.props.uploaderNickname)
+                            .collection(referThis.props.videoID).doc('video_info');
+                        videos_ref.set({
+                            likes: originalLikes + 1,
+                            dislikes: originalDislikes
+                        }, { merge: true });
+                    });
 
-                    //Push out the updates
-                    databaseRef.ref().update(updates);
-                    console.log("B: " + snapshot.val().like);
+                    //Set the boolean to false. 
+                    activeStatRef.set({
+                        like: true,
+                        dislike: false
+                    }, { merge: true });
                 }
             });
-
         } else {
             //If the User has not logged in, then alert them and let them know. 
             this.refs.denyModal.show();;
@@ -160,44 +192,84 @@ class SocialButtonComponent extends Component {
 
     /**
      * Dislike the video based on whether or not they have liked it before or disliked it before. 
-     * @param {*} uniqueKey 
      */
-    dislikeButton(uniqueKey) {
-        var originalDislikes, referThis = this, dislikeUpdates = {};
+    dislikeButton() {
+        var originalDislikes = this.state.dislikes, referThis = this, originalLikes = this.state.likes;
         //User has logged in.
         if (this.props.activeUser) {
+            const activeStatRef = db.collection('stats').doc(this.props.activeUserEmail)
+                .collection(referThis.props.videoID).doc('socialNumbers');
 
-            //Get the original like number
-            originalDislikes = this.state.dislikes;
-            var originalLikes = this.state.likes;
-            //Check if the user has liked it before
-            var checkStatRef = databaseRef.ref('statKeeper/' + referThis.props.userid + '/' + uniqueKey);
-            checkStatRef.once('value').then(function (snapshot) {
-                if ((snapshot.val()) == null || !(snapshot.val().dislike)) {
-                    //If the user has not liked it before set LIKE to true and dislike to false
-                    dislikeUpdates['statKeeper/' + referThis.props.userid + '/' + uniqueKey + '/like'] = false;
-                    dislikeUpdates['statKeeper/' + referThis.props.userid + '/' + uniqueKey + '/dislike'] = true;
-                    dislikeUpdates['stats/' + uniqueKey + '/dislikes'] = originalDislikes + 1;
+            activeStatRef.get().then(function (snapshot) {
+                if (snapshot && snapshot.exists) {
 
-                    //If the user has LIKED the video before then unlike it
-                    if (snapshot.val().like) {
-                        dislikeUpdates['stats/' + uniqueKey + '/likes'] = originalLikes - 1;
+                    if (snapshot.data().like) {
+                        //User has liked the video before so decrement that counter 
+                        referThis.setState({
+                            likedBefore: true
+                        });
                     }
+                    if (snapshot.data().dislike) {
+                        //User already dislikes it so decrement the counter
+                        //decrement the counter first under videos and then under all_videos 
+                        let all_videosRef = db.collection('all_videos').doc(referThis.props.videoID);
+                        all_videosRef.set({
+                            dislikes: originalDislikes - 1
+                        }, { merge: true }).then(function () {
+                            let videos_ref = db.collection('videos').doc(referThis.props.uploaderNickname)
+                                .collection(referThis.props.videoID).doc('video_info');
+                            videos_ref.set({
+                                dislikes: originalDislikes - 1
+                            }, { merge: true });
+                        });
 
-                    //Push out the dislikeUpdates
-                    databaseRef.ref().update(dislikeUpdates);
-                    console.log("DislikeButton A: " + snapshot.exists());
-                } else if (snapshot.val().dislike) {
-                    //if the user has disliked it before, then set the dislike to false and decrement the dislike #
-                    dislikeUpdates['statKeeper/' + referThis.props.userid + '/' + uniqueKey + '/dislike'] = false;
-                    dislikeUpdates['stats/' + uniqueKey + '/dislikes'] = originalDislikes - 1;
+                        //Set the boolean to false. 
+                        activeStatRef.set({
+                            dislike: false,
+                        }, { merge: true });
 
-                    //Push out the dislikeUpdates
-                    databaseRef.ref().update(dislikeUpdates);
-                    console.log("DislikeButton B: " + snapshot.val().dislike);
+                    } else {
+                        //user has not liked it before so increment the counter 
+                        let all_videosRef = db.collection('all_videos').doc(referThis.props.videoID);
+                        all_videosRef.set({
+                            dislikes: originalDislikes + 1,
+                            likes: referThis.state.likedBefore ? originalLikes - 1 : originalLikes
+                        }, { merge: true }).then(function () {
+                            let videos_ref = db.collection('videos').doc(referThis.props.uploaderNickname)
+                                .collection(referThis.props.videoID).doc('video_info');
+                            videos_ref.set({
+                                dislikes: originalDislikes + 1,
+                                likes: referThis.state.likedBefore ? originalLikes - 1 : originalLikes
+                            }, { merge: true });
+                        });
+                        //Set the boolean to false. 
+                        activeStatRef.set({
+                            like: false,
+                            dislike: true
+                        }, { merge: true });
+                    }
+                } else {
+                    //user has never liked it before
+                    let all_videosRef = db.collection('all_videos').doc(referThis.props.videoID);
+                    all_videosRef.set({
+                        dislikes: originalDislikes + 1,
+                        likes: referThis.state.likedBefore ? originalLikes - 1 : originalLikes
+                    }, { merge: true }).then(function () {
+                        let videos_ref = db.collection('videos').doc(referThis.props.uploaderNickname)
+                            .collection(referThis.props.videoID).doc('video_info');
+                        videos_ref.set({
+                            dislikes: originalDislikes + 1,
+                            likes: referThis.state.likedBefore ? originalLikes - 1 : originalLikes
+                        }, { merge: true });
+                    });
+
+                    //Set the boolean to false. 
+                    activeStatRef.set({
+                        like: false,
+                        dislike: true
+                    }, { merge: true });
                 }
             });
-
         } else {
             //If the User has not logged in, then alert them and let them know. 
             this.refs.denyModal.show();
@@ -223,59 +295,12 @@ class SocialButtonComponent extends Component {
      * When the user wants to challenge the Posted video, Pop up a modal to ask them to confirm
      * and then go to the video upload page and ask them to upload the challenging video..
      * Also, pass in something to Upload video page so that it looks different if its an upload. 
-     * @param {*} uniqueKey 
      */
-    challengeButton(uniqueKey) {
+    challengeButton() {
         var referThis = this, challengerUserID = referThis.props.activeUserID;
 
         //Check if they are logged in and that the user does not challenge his own video
         if (referThis.props.activeUser) {
-            //Make Sure user can't challenge ThemSelves!
-            if (referThis.props.activeUserID !== referThis.props.userid) {
-                //Challenges --> UniqueKey --> ChallengerUserID --> videoURL ... HIT1 ... HIT2
-
-                //Check if the user has already challenged the person first. 
-                var checkChallengeStatus = databaseRef.ref('challenges/' + uniqueKey);
-                checkChallengeStatus.once('value', function (snapshot) {
-                    if (!snapshot.exists()) {
-                        //If there are currently no challenges, create one under this user. 
-                        checkChallengeStatus.child(challengerUserID).set({
-                            //Set the fields 
-                            challengerVideo: "",
-                            challengerUniqueKey: "",
-                            challengedHits: 0,
-                            challengerHits: 0
-                        }).then(
-                            referThis.submitChallenge(uniqueKey)
-                            )
-
-                    } else {
-                        //There have already been challenges to this video by either this user or others before. 
-                        snapshot.forEach(function (childSnapshot) {
-                            if (challengerUserID === (childSnapshot.key)) {
-                                //The challenge between this video and the user already exists
-                                window.alert("You have already challenged this video");
-
-                            } else {
-                                //Challenge does not already exist so create a new one. 
-                                checkChallengeStatus.child(challengerUserID).set({
-                                    //Set the fields 
-                                    challengerVideo: "",
-                                    challengerUniqueKey: "",
-                                    challengedHits: 0,
-                                    challengerHits: 0
-                                }).then(
-                                    referThis.submitChallenge()
-                                    )
-                            }
-                        })
-                    }
-
-
-                })
-            } else {
-
-            }
 
         } else {
             this.refs.denyModal.show();
@@ -306,105 +331,82 @@ class SocialButtonComponent extends Component {
     }
 
     /**
-    * Sumbit the whole challenge by uploading to storage as well as writing values to database 
+    * When the user submits the challenge, 
+     - Increment the challenge counter at all_videos and videos node
+     - Increment counter on their profile. 
+     - Upload the video under challenges --> 
     */
-    submitChallenge(uniqueKey) {
-        var referThis = this;
-        //get the TITLE, DESCRIPTION, and CATEGORY
-        var title = document.getElementById('videoTitle').value, description = document.getElementById('challengeDescription').value;
-        //get the radio button chosen
-        var category, e = document.getElementById('categoryPicker');
-        category = e.options[e.selectedIndex].text;
+    submitChallenge() {
+        var referThis = this, title = document.getElementById('titleInput').value,
+            description = document.getElementById('descriptionInput').value;
 
-        //name of the file uploaded.
-        var randString = title + '_' + this.randomString();
+        //Delet the temp    
+
+        //get the unique nickname
+        var random_title = title + '_' + this.randomString();
 
         //set up the Ref to STORAGE for the video that is to be uploaded
-        var videoRef = defStorageRef.child('users/' + referThis.props.activeUserID + '/uploaded_videos/' + randString);
-
-        //upload task is where it actually gets uploaded and if not, it will throw an error. 
+        var videoRef = storageRef.child('users/' + this.state.nickname + '/uploaded_video/' + random_title);
         var uploadTask = videoRef.put(this.state.filesToBeSent[0]);
+
         uploadTask.on('state_changed', function (snapshot) {
-            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            //measure the progress of the upload. 
             switch (snapshot.state) {
-                case firebase.storage.TaskState.PAUSED: // or 'paused'
-                    console.log('Upload is paused');
+                case firebase.storage.TaskState.PAUSED:
+                    console.log('Upload is PAUSED');
                     break;
-                case firebase.storage.TaskState.RUNNING: // or 'running'
-                    console.log('Upload is running');
-                    console.log(videoRef.fullPath);
+                case firebase.storage.TaskState.RUNNING:
+                    //console.log('Upload is RUNNING');
+                    document.getElementById('submitButton').innerText = "Uploading...: " + Math.ceil((snapshot.bytesTransferred / snapshot.totalBytes) * 100) + "%";
                     break;
                 default:
-                    console.log("....");
+                    console.log('Uploading...');
+                    break;
             }
-            document.getElementById('CardHeader').innerText = Math.ceil(progress) + "%";
         }, function (error) {
-            //Upload was unsuccessfull so let them try again later and refresh the page. 
-            window.alert("Upload Unsuccessfull. Please try again later! " + error.message);
-            window.location.replace('/Userprofile');
-
-            //empty out array after everything is done. 
-            this.emptyArray();
-
+            //There was an error uploading the file. 
+            document.getElementById('submitButton').innerText = 'Error Uploading File. Please try again later. ';
+            referThis.emptyArray();
         }, function () {
-            // Handle successful uploads on complete
-            var downloadURL = uploadTask.snapshot.downloadURL;
-            /**
-             * Upload the video Information to the USER'S LIST
-             */
-            var videoUserIDUpload = databaseRef.ref('videos/' + referThis.props.activeUserID + '/uploaded_videos/').push();
-            videoUserIDUpload.set({
+            //Success uploading file. 
+            //Get the download url 
+            const downloadURL = uploadTask.snapshot.downloadURL;
+            //Submit the info to Firestore
+            var video_doc_ref = db.collection('videos').doc(referThis.state.nickname).collection(random_title).doc('video_info');
+            console.log('New Document ID: ' + video_doc_ref.id);
+            video_doc_ref.set({
+                title: title,
                 videoURL: downloadURL,
-                videoTitle: title,
                 videoDesc: description,
-                videoCategory: category
-            });
-
-            /**
-             * Upload the video to all the POSTS
-             * In order to keep all the video lists on web updated, under the 'POSTS' node, push out links to all the videos uploaded by user.
-             * This way, it's easier to sort them by time updated and other features.
-             */
-            var newVideoRef = databaseRef.ref('posts/').push();
-            newVideoRef.set({
-                videoURL: downloadURL,
-                videoTitle: title,
-                videoDesc: description,
-                videoCategory: category,
-                userid: referThis.props.activeUserID,
-                profilePic: referThis.props.profilePicURL,
-                userName: referThis.props.activeUserName
-            });
-            /*     var updateProfiles =[];
-                 updateProfiles['posts/' + newVideoRef.key + '/profilePic'] = referThis.props.profilePic;
-                 databaseRef.ref().update(updateProfiles); */
-            /**
-             * Upload the likes/dislikes/challenge numbers to status/key/---
-             * This helps refresh the numbers in real time on page
-             */
-            var keyToUploadUnder = newVideoRef.key;
-            var statsUpload = databaseRef.ref('stats/' + keyToUploadUnder + '/');
-            statsUpload.set({
+                tagged: '',
                 likes: 0,
                 dislikes: 0,
-                challenges: 0
+                challenges: 0,
+                nickname: referThis.state.nickname,
+                email: referThis.state.email
+            }, { merge: true }).then(function () {
+                //This collection will be used to display all the videos on Homepage. 
+                var all_vid_ref = db.collection('all_videos').doc(random_title);
+                all_vid_ref.set({
+                    title: title,
+                    videoURL: downloadURL,
+                    videoDesc: description,
+                    tagged: '',
+                    likes: 0,
+                    dislikes: 0,
+                    challenges: 0,
+                    nickname: referThis.state.nickname,
+                    email: referThis.state.email
+                }, { merge: true }).then(function () {
+                    //Success uploading the data
+                    document.getElementById('submitButton').innerText = "Upload Success!";
+                    window.location.replace('/check_user_status');
+                });
+            }).catch(function (error) {
+                document.getElementById('submitButton').innerText = "Error uploading";
             });
-
-            /**
-             * Update the CHALLENGE HITS and ChallengerVideo / ChallengerUniqueKey
-             */
-            var updates = {};
-            updates['challenges/' + uniqueKey + '/' + referThis.props.activeUserID + '/challengerUniqueKey'] = keyToUploadUnder;
-            updates['challenges/' + uniqueKey + '/' + referThis.props.activeUserID + '/challengerVideo'] = downloadURL;
-            updates['challenges/' + uniqueKey + '/' + referThis.props.activeUserID + '/challengedHits'] = 0;
-            updates['challenges/' + uniqueKey + '/' + referThis.props.activeUserID + '/challengerHits'] = 0;
-            databaseRef.ref().update(updates);
-
-            //Replace the location to the homepage -- FOR NOW, change it later. 
-            window.location.replace('/');
+            //submit to all videos node. 
         });
-        //empty out array after everything is done. 
-        this.emptyArray();
     }
 
     /**
@@ -413,22 +415,52 @@ class SocialButtonComponent extends Component {
     * @param {*} rejectedFiles 
     */
     onDrop(acceptedFiles, rejectedFiles) {
+        let referThis = this;
+
         if (rejectedFiles === undefined && acceptedFiles[0] === undefined) {
             window.alert("Please choose a valid video file!");
             window.location.replace('/UploadVideo');
         } else {
-            console.log("Accepted File: " + acceptedFiles[0].type)
-            //assign the state.array to filesToBeSent var then push this file into it and then assign it back to state.
-            var filesToBeSent = this.state.filesToBeSent;
+            document.getElementById('demo_div').style.display = 'block';
 
-            //Create an Object URL from th Video. 
-            var objectURL = URL.createObjectURL(acceptedFiles[0]);
-            console.log("Video URL: " + objectURL);
+            //Upload the file to the Temp storage 
+            var temp_ref = storageRef.child('users/' + this.state.activeNickname + '/temp_video/temp_video_file');
+            var uploadTask = temp_ref.put(acceptedFiles[0]);
+            uploadTask.on('state_changed', function (snapshot) {
+                //measure the progress of the upload. 
+                switch (snapshot.state) {
+                    case firebase.storage.TaskState.PAUSED:
+                        console.log('Upload is PAUSED');
+                        break;
+                    case firebase.storage.TaskState.RUNNING:
+                        //console.log('Upload is RUNNING');
+                        document.getElementById('file_upload_status').innerText = "Uploading...: " + Math.ceil((snapshot.bytesTransferred / snapshot.totalBytes) * 100) + "%";
+                        break;
+                    default:
+                        console.log('Uploading...');
+                        break;
+                }
+            }, function (error) {
+                //There was an error uploading the tempfile
+                document.getElementById('upload_label').innerText = 'Error uploading File. Please try again later. ';
+                referThis.emptyArray();
+            }, function () {
+                referThis.emptyArray();
+                //Success uploading the temp file and get the download URL. and then delete the file. 
+                const downloadURL = uploadTask.snapshot.downloadURL;
+                //set the state to the temp video. 
+                referThis.setState({
+                    temp_video: downloadURL
+                });
+                temp_ref.delete().then(function () {
+                    console.log('Temp Fil Deleted');
+                });
 
-            //Push the file to the array and then setState with it. 
-            filesToBeSent.push(acceptedFiles[0]);
-            this.setState({ filesToBeSent });
-            //Pass the file into the Parent from the state
+                //Clear out the previous state and then push this file to it 
+                var filesToBeSent = referThis.state.filesToBeSent;
+                filesToBeSent.push(acceptedFiles[0]);
+                referThis.setState({ filesToBeSent });
+            });
         }
     }
 
@@ -436,7 +468,7 @@ class SocialButtonComponent extends Component {
         if (this.props.buttonType === "like") {
             return (
                 <div>
-                    <a id={this.props.userid + this.props.uniqueKey + 'like'} className="supportButtons" onClick={() => this.likeButton(this.props.uniqueKey)} role="button">
+                    <a id={this.props.activeUserID + this.props.eachKey + 'like'} className="supportButtons" onClick={() => this.likeButton()} role="button">
                         <i className="far fa-thumbs-up" id="button_icon"></i></a>
                     <p>{this.state.likes}</p>
                     <Modal ref="denyModal" modalStyle={{ width: 'auto' }}>
@@ -450,7 +482,7 @@ class SocialButtonComponent extends Component {
         } else if (this.props.buttonType === "challenge") {
             return (
                 <div>
-                    <a id={this.props.userid + this.props.uniqueKey + 'challenge'} className="supportButtons" onClick={() => this.showModal()} role="button">
+                    <a id={this.props.activeUserID + this.props.eachKey + 'challenge'} className="supportButtons" onClick={() => this.showModal()} role="button">
                         <i className="fab fa-connectdevelop" id="button_icon"></i></a>
                     <p>{this.state.challenges}</p>
                     <Modal ref="denyModal" modalStyle={{ width: 'auto' }}>
@@ -461,50 +493,46 @@ class SocialButtonComponent extends Component {
                     </Modal>
                     <Modal ref="modal" modalStyle={modalStyle}>
                         <div className="card uploadCard">
+                            <h3 className="card-header text-center" id="card_header">Upload Video</h3>
                             <div className="card-block">
                                 <form>
-                                    <h2 className="form-signin-heading text-center">Upload Challenge Video</h2>
-                                    <hr />
                                     <div className="form-group">
-                                        <h4>Title</h4>
-                                        <input type="text" className="form-control" id="videoTitle" placeholder="Video Title" required />
-                                        <br />
-
-                                        <label>File input</label>
-                                        <Dropzone id="dropZzone" type="file" onDrop={(files) => this.onDrop(files)} accept="video/*" multiple={false} required>
+                                        <input type="text" className="form-control" id="titleInput" placeholder="Title of the Video" required />
+                                    </div>
+                                    <div className="form-group">
+                                        <textarea rows="3" maxLength="200" type="text" className="form-control" id="descriptionInput"
+                                            placeholder="What is the Video about?..." required />
+                                    </div>
+                                    <div className="form-group">
+                                        <input type="text" className="form-control" id="tagUsers" placeholder="Tag anyone?...This feature is not added yet..."
+                                            disabled="true" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label id="upload_label">Upload Video</label>
+                                        <Dropzone id="dropzoneVid" type="file" onDrop={(files) => this.onDrop(files)} accept="video/*" multiple={false} required>
                                             <div>Click to Upload or Drag your video here</div>
                                         </Dropzone>
-                                        <small className="form-text text-muted">Supported: All Video Formats </small>
-                                        <br /><br />
-
-                                        <label>Description</label>
-                                        <textarea className="form-control" id="challengeDescription" rows="3"
-                                            placeholder="Please provide a brief description"
-                                            required></textarea>
-                                        <br />
-                                        <label>Choose a Category</label> <br />
-                                        <select className="selectpicker" id="categoryPicker" required>
-                                            <option>Comedy</option>
-                                            <option>Cooking</option>
-                                            <option>Dance</option>
-                                            <option>Sports</option>
-                                        </select>
+                                        <small id="fileHelp" className="form-text text-muted">Supported: All Video Formats </small>
+                                        <small id="file_upload_status" className="form-text text-muted"></small>
+                                        <div id="demo_div" style={{ display: 'none' }}>
+                                            <Player src={this.state.temp_video}></Player>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
+                            <div className="card-footer text-center">
+                                <button type="button" className="btn btn-lg btn-outline-danger" id="submitButton"
+                                    onClick={() => this.submitChallenge()} > Upload Challenge Video</button>
+                            </div>
                         </div>
-                        <button type="button" className="btn btn-lg btn-danger"
-                            onClick={() => this.challengeButton(this.props.uniqueKey)} >Challenge</button>
-                        <button type="button" className="btn btn-lg btn-secondary"
-                            onClick={() => this.closeModal()}> Cancel </button>
                     </Modal>
                 </div>
             );
         } else if (this.props.buttonType === "dislike") {
             return (
                 <div>
-                    <a id={this.props.userid + this.props.uniqueKey + 'dislike'}
-                        className="supportButtons" onClick={() => this.dislikeButton(this.props.uniqueKey)} role="button">
+                    <a id={this.props.activeUserID + this.props.eachKey + 'dislike'}
+                        className="supportButtons" onClick={() => this.dislikeButton()} role="button">
                         <i className="far fa-thumbs-down" id="button_icon"></i></a>
                     <p>{this.state.dislikes}</p>
                     <Modal ref="denyModal" modalStyle={{ width: 'auto' }}>

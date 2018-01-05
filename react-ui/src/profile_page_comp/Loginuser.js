@@ -51,6 +51,9 @@ class Loginuser extends Component {
         }
     }
 
+    /**
+     * Check if the email already exists in the database. 
+     */
     checkEmail() {
         //get the data entered. 
         const email_input = document.getElementById('email_input').value;
@@ -78,6 +81,9 @@ class Loginuser extends Component {
         })
     }
 
+    /**
+     * Login with the email and password method instead of either Google or Facebook. 
+     */
     loginWithEmail() {
         //User wants to signup with email so sign him up
         const email_input = document.getElementById('email_input').value;
@@ -85,8 +91,9 @@ class Loginuser extends Component {
         const userRef = db.collection('users').doc(email_input);
         userRef.set({
             userEmail: email_input,
-            password_input: password_input
-        }).then(function () {
+            password_input: password_input,
+            first: 'true'
+        }, { merge: true }).then(function () {
             console.log("Data Saved");
             //Sign up the user with the email and password. 
             firebase.auth().createUserWithEmailAndPassword(email_input, password_input).catch(function (error) {
@@ -98,6 +105,7 @@ class Loginuser extends Component {
         });
 
     }
+
     render() {
 
 

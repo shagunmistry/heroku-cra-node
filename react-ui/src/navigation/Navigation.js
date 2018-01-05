@@ -52,10 +52,10 @@ export default class Navigationbar extends Component {
             //make sure all LINKS are wrapped in Router
             <Router>
 
-                <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+                <nav className="navbar navbar-expand-lg sticky-top" id="main_nav">
                     <a className="navbar-brand" href="Hometrend"><img alt="Logo" src={Keys.navbar_brand} width="30" height="30" /></a>
                     <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavBar" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span className="navbar-toggler-icon"></span>
+                        <i className="fas fa-chevron-circle-down" id="navbar_toggler"></i>
                     </button>
 
                     <div className="collapse navbar-collapse" id="myNavBar">
@@ -68,7 +68,7 @@ export default class Navigationbar extends Component {
                                     <i className="fas fa-chart-bar"></i> Ongoing Challenges</a>
                             </li>
                             <li className="nav-item">
-                                <a href="/UploadVideo" id="nav_link" className="nav-link">
+                                <a href="/Upload" id="nav_link" className="nav-link">
                                     <i className="fa fa-upload"></i><span> Upload Video</span></a>
                             </li>
                             <li className="nav-item">
@@ -80,7 +80,7 @@ export default class Navigationbar extends Component {
                                 <a className="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i className="fa fa-id-badge"></i>
                                 </a>
-                                <div className="dropdown-menu" aria-labelledby="navbarDropdown" id="profile_options_btns">
+                                <div className="dropdown-menu text-center" aria-labelledby="navbarDropdown" id="profile_options_btns">
                                     <button id="logOutButton" className="dropdown-item btn btn-info btn-4"
                                         type="button" onClick={() => this.logOut()}>Log Out</button>
                                     <button id="editButton" className="dropdown-item btn btn-info"
@@ -88,9 +88,9 @@ export default class Navigationbar extends Component {
                                 </div>
                             </li>
                         </ul>
-                        <form className="form-inline my-2 my-lg-0">
-                            <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
-                            <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                        <form className="form-inline my-2 my-lg-0" id="search_box">
+                            <input  className="form-control mr-sm-2" type="search" placeholder="Search..." aria-label="Search" />
+                            <button className="btn btn-outline-danger my-2 my-sm-0" type="submit">Search</button>
                         </form>
                     </div>
                 </nav>
