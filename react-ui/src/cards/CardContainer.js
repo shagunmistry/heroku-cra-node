@@ -33,11 +33,10 @@ class CardContainer extends Component {
         return text;
     }
     componentWillMount() {
-        //Get the data
         var referThis = this;
+        //console.log(this.props);
 
         //Only for homepage 
-        //The ELSE part is for categorized or for User's page.
         if (!this.props.customize) {
             //Go to the collection
             const videoRef = db.collection('all_videos');
@@ -64,47 +63,37 @@ class CardContainer extends Component {
                 });
             });
 
-        } else {
-
-            /*   //Right now only for user's page.  --> Add category based listings later
-               const userId = this.props.userId;
-               var user_name, profile_Picture;
-   
-               //get the userName
-               dataRef.ref('/users/' + userId).on('value', function (snapshot) {
-                   //if the snapshot exists
-                   if (snapshot.val()) {
-                       user_name = snapshot.val().username;
-                       profile_Picture = snapshot.val().profile_picture;
-                   }
-               });
-               var upload_video_ref = dataRef.ref('videos/' + userId + '/uploaded_videos/');
-   
-               //Get all the videos from the user's database. 
-               upload_video_ref.on('value', function (snapshot) {
-                   snapshot.forEach(function (data) {
-                       //Store each value into an name-based object. 
-                       userInfo.userid = userId;
-                       userInfo.profilePic = profile_Picture;
-                       userInfo.videoCategory = data.val().videoCategory;
-                       userInfo.videoDesc = data.val().videoDesc;
-                       userInfo.videoTitle = data.val().videoTitle;
-                       userInfo.videoURL = data.val().videoURL;
-                       userInfo.userName = user_name;
-                       userInfo.uniqueKey = data.key;
-                       //console.log(userInfo);
-                       //Then push the object into an array.
-                       userArray.push(userInfo);
-                       //reset the userInfo object (just in case);
-                       userInfo = {};
-                       //console.log("Firebase function: " + userArray.length);
-                   });
-                   referThis.setState({
-                       usedArray: userArray,
-                   });
-   
-                   // console.log(referThis.state.usedArray);
-               });*/
+        } else if (this.props.visitorBoolean || !this.props.visitorBoolean) {
+            console.log(this.props.visitorNickname + " is visiting " + this.props.profileNickname + "'s profile!");
+            //Get the user's nickname 
+            let profileNickname = this.props.profileNickname;
+            const videoRef = db.collection('all_videos').where('nickname', '==', profileNickname);
+            videoRef.get().then(function (querySnap) {
+                querySnap.forEach(function (doc) {
+                    if (doc && doc.exists) {
+                        userInfo.videoURL = doc.data().videoURL;
+                        userInfo.videoDesc = doc.data().videoDesc;
+                        userInfo.videoTitle = doc.data().title;
+                        userInfo.likes = doc.data().likes;
+                        userInfo.dislikes = doc.data().dislikes;
+                        userInfo.challenges = doc.data().challenges;
+                        userInfo.nickname = doc.data().nickname;
+                        userInfo.tagged = doc.data().tagged;
+                        userInfo.email = doc.data().email;
+                        userInfo.videoID = doc.id;
+                        userInfo.eachKey = referThis.uniqueKeyCreator();
+                        //Then push the object into an array.
+                        userArray.push(userInfo);
+                        //reset the userInfo object (just in case);
+                        userInfo = {};
+                        referThis.setState({
+                            usedArray: userArray
+                        });
+                    }
+                });
+            }).catch(function (error) {
+                console.log('Error getting vides for this this user: ' + error);
+            });
         }
     }
 

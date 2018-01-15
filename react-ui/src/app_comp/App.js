@@ -8,10 +8,9 @@ import Profilepage from '../profile_page_comp/Profile_page';
 import EditProfile from '../profile_page_comp/EditProfile';
 import UploadVideo from '../uploadPage/UploadVideo';
 import FollowersPage from '../profile_stats/FollowersPage';
+import ChallengePage from '../challenges_page/ChallengePage';
 
 import firebaseApp from '../firebase/Firebase';
-
-
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
@@ -67,11 +66,12 @@ class App extends Component {
             <Route exact path="/" component={Hometrend} />
             <Route exact path="/Hometrend" component={Hometrend} />
             <Route exact path="/trending-challenges" component={OngoingChallenges} />
+            <Route path="/challenge/:challengeid" component={ChallengePage} />
             <Route exact path="/check_user_status" component={ProfileCheck} />
             <Route path="/users/:nickname" component={Profilepage} />
-            <Route exact path="/EditProfile" component={this.state.loggedIn ? EditProfile : ProfileCheck} />
-            <Route exact path="/Upload" component={this.state.loggedIn ? UploadVideo : ProfileCheck} />
-            <Route exact path="/stats" component={this.state.loggedIn ? FollowersPage : ProfileCheck} />
+            <Route exact path="/EditProfile" component={EditProfile} />
+            <Route exact path="/Upload" component={UploadVideo} />
+            <Route exact path="/stats" component={FollowersPage} />
           </div>
         </Router>
       </div>

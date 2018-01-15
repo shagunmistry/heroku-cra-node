@@ -17,7 +17,8 @@ var storageRef = firebaseApp.storage().ref(), databaseRef = firebaseApp.database
 
 var Modal = require('boron/ScaleModal');
 var modalStyle = {
-    width: 'auto',
+    width: '80%',
+    height: '100%'
 }
 
 
@@ -38,7 +39,6 @@ class SocialButtonComponent extends Component {
         this.componentDidMount = this.componentDidMount.bind(this);
 
         //Methods needed to Upload a Challenge Video
-        this.challengeButton = this.challengeButton.bind(this);
         this.showModal = this.showModal.bind(this); this.closeModal = this.closeModal.bind(this);
         this.emptyArray = this.emptyArray.bind(this);
         this.submitChallenge = this.submitChallenge.bind(this);
@@ -290,23 +290,6 @@ class SocialButtonComponent extends Component {
         this.refs.modal.hide();
     }
 
-
-    /**
-     * When the user wants to challenge the Posted video, Pop up a modal to ask them to confirm
-     * and then go to the video upload page and ask them to upload the challenging video..
-     * Also, pass in something to Upload video page so that it looks different if its an upload. 
-     */
-    challengeButton() {
-        var referThis = this, challengerUserID = referThis.props.activeUserID;
-
-        //Check if they are logged in and that the user does not challenge his own video
-        if (referThis.props.activeUser) {
-
-        } else {
-            this.refs.denyModal.show();
-        }
-    }
-
     /**
     * Empty out the array used for storage 
     */
@@ -340,54 +323,43 @@ class SocialButtonComponent extends Component {
         var referThis = this, title = document.getElementById('titleInput').value,
             description = document.getElementById('descriptionInput').value;
 
-        //Delet the temp    
+        if (title === "" || description === "") {
+            document.getElementById('file_upload_status').innerText = "Please fill in all fields";
+        } else {
+            //get the unique nickname
+            var random_title = title + '_' + this.randomString();
 
-        //get the unique nickname
-        var random_title = title + '_' + this.randomString();
+            //set up the Ref to STORAGE for the video that is to be uploaded
+            var videoRef = storageRef.child('users/' + this.props.activeNickname + '/uploaded_video/' + random_title);
+            var uploadTask = videoRef.put(this.state.filesToBeSent[0]);
 
-        //set up the Ref to STORAGE for the video that is to be uploaded
-        var videoRef = storageRef.child('users/' + this.state.nickname + '/uploaded_video/' + random_title);
-        var uploadTask = videoRef.put(this.state.filesToBeSent[0]);
-
-        uploadTask.on('state_changed', function (snapshot) {
-            //measure the progress of the upload. 
-            switch (snapshot.state) {
-                case firebase.storage.TaskState.PAUSED:
-                    console.log('Upload is PAUSED');
-                    break;
-                case firebase.storage.TaskState.RUNNING:
-                    //console.log('Upload is RUNNING');
-                    document.getElementById('submitButton').innerText = "Uploading...: " + Math.ceil((snapshot.bytesTransferred / snapshot.totalBytes) * 100) + "%";
-                    break;
-                default:
-                    console.log('Uploading...');
-                    break;
-            }
-        }, function (error) {
-            //There was an error uploading the file. 
-            document.getElementById('submitButton').innerText = 'Error Uploading File. Please try again later. ';
-            referThis.emptyArray();
-        }, function () {
-            //Success uploading file. 
-            //Get the download url 
-            const downloadURL = uploadTask.snapshot.downloadURL;
-            //Submit the info to Firestore
-            var video_doc_ref = db.collection('videos').doc(referThis.state.nickname).collection(random_title).doc('video_info');
-            console.log('New Document ID: ' + video_doc_ref.id);
-            video_doc_ref.set({
-                title: title,
-                videoURL: downloadURL,
-                videoDesc: description,
-                tagged: '',
-                likes: 0,
-                dislikes: 0,
-                challenges: 0,
-                nickname: referThis.state.nickname,
-                email: referThis.state.email
-            }, { merge: true }).then(function () {
-                //This collection will be used to display all the videos on Homepage. 
-                var all_vid_ref = db.collection('all_videos').doc(random_title);
-                all_vid_ref.set({
+            uploadTask.on('state_changed', function (snapshot) {
+                //measure the progress of the upload. 
+                switch (snapshot.state) {
+                    case firebase.storage.TaskState.PAUSED:
+                        console.log('Upload is PAUSED');
+                        break;
+                    case firebase.storage.TaskState.RUNNING:
+                        //console.log('Upload is RUNNING');
+                        document.getElementById('submitButton').innerText = "Uploading...: " + Math.ceil((snapshot.bytesTransferred / snapshot.totalBytes) * 100) + "%";
+                        break;
+                    default:
+                        console.log('Uploading...');
+                        break;
+                }
+            }, function (error) {
+                //There was an error uploading the file. 
+                document.getElementById('submitButton').innerText = 'Error Uploading File. Please try again later. ';
+                referThis.emptyArray();
+            }, function () {
+                //Success uploading file. 
+                //Get the download url 
+                const downloadURL = uploadTask.snapshot.downloadURL;
+                //Submit the info to Firestore
+                var video_doc_ref = db.collection('videos').doc(referThis.props.activeNickname).collection(random_title).doc('video_info');
+                var challenge_ref = db.collection('challenges').doc(referThis.props.uploaderNickname + '_' + referThis.props.activeNickname);
+                //console.log('New Document ID: ' + video_doc_ref.id);
+                video_doc_ref.set({
                     title: title,
                     videoURL: downloadURL,
                     videoDesc: description,
@@ -395,18 +367,46 @@ class SocialButtonComponent extends Component {
                     likes: 0,
                     dislikes: 0,
                     challenges: 0,
-                    nickname: referThis.state.nickname,
-                    email: referThis.state.email
+                    nickname: referThis.props.activeNickname,
+                    email: referThis.props.activeUserEmail
                 }, { merge: true }).then(function () {
-                    //Success uploading the data
-                    document.getElementById('submitButton').innerText = "Upload Success!";
-                    window.location.replace('/check_user_status');
+                    //This collection will be used to display all the videos on Homepage. 
+                    var all_vid_ref = db.collection('all_videos').doc(random_title);
+                    all_vid_ref.set({
+                        title: title,
+                        videoURL: downloadURL,
+                        videoDesc: description,
+                        tagged: '',
+                        likes: 0,
+                        dislikes: 0,
+                        challenges: 0,
+                        nickname: referThis.props.activeNickname,
+                        email: referThis.props.activeUserEmail
+                    }, { merge: true }).then(function () {
+                        //Success uploading the data
+                        document.getElementById('submitButton').innerText = "Upload Success!";
+                        window.location.replace('/check_user_status');
+                    }).then(function () {
+                        //Commit the Challngers Video. 
+                        challenge_ref.set({
+                            challenger: referThis.props.activeNickname,
+                            challenged: referThis.props.uploaderNickname,
+                            challengerVotes: 0,
+                            challengedVotes: 0,
+                            challengerVideoTitle: title,
+                            challengedVideoTitle: referThis.props.videoTitle
+                        }, { merge: true });
+                        let temp_ref = storageRef.child('users/' + referThis.state.activeNickname + '/temp_video/temp_video_file');
+                        temp_ref.delete();
+
+                    });
+                }).catch(function (error) {
+                    document.getElementById('submitButton').innerText = "Error uploading";
                 });
-            }).catch(function (error) {
-                document.getElementById('submitButton').innerText = "Error uploading";
             });
-            //submit to all videos node. 
-        });
+        }
+
+
     }
 
     /**
@@ -422,7 +422,6 @@ class SocialButtonComponent extends Component {
             window.location.replace('/UploadVideo');
         } else {
             document.getElementById('demo_div').style.display = 'block';
-
             //Upload the file to the Temp storage 
             var temp_ref = storageRef.child('users/' + this.state.activeNickname + '/temp_video/temp_video_file');
             var uploadTask = temp_ref.put(acceptedFiles[0]);
@@ -452,9 +451,9 @@ class SocialButtonComponent extends Component {
                 referThis.setState({
                     temp_video: downloadURL
                 });
-                temp_ref.delete().then(function () {
+                /*temp_ref.delete().then(function () {
                     console.log('Temp Fil Deleted');
-                });
+                }); */
 
                 //Clear out the previous state and then push this file to it 
                 var filesToBeSent = referThis.state.filesToBeSent;
@@ -492,15 +491,15 @@ class SocialButtonComponent extends Component {
                         </div>
                     </Modal>
                     <Modal ref="modal" modalStyle={modalStyle}>
-                        <div className="card uploadCard">
-                            <h3 className="card-header text-center" id="card_header">Upload Video</h3>
+                        <div className="card challengeUploadCard">
+                            <h4 className="card-header text-center" id="card_header">Upload Video</h4>
                             <div className="card-block">
                                 <form>
                                     <div className="form-group">
                                         <input type="text" className="form-control" id="titleInput" placeholder="Title of the Video" required />
                                     </div>
                                     <div className="form-group">
-                                        <textarea rows="3" maxLength="200" type="text" className="form-control" id="descriptionInput"
+                                        <textarea rows="2" maxLength="200" type="text" className="form-control" id="descriptionInput"
                                             placeholder="What is the Video about?..." required />
                                     </div>
                                     <div className="form-group">
@@ -514,8 +513,8 @@ class SocialButtonComponent extends Component {
                                         </Dropzone>
                                         <small id="fileHelp" className="form-text text-muted">Supported: All Video Formats </small>
                                         <small id="file_upload_status" className="form-text text-muted"></small>
-                                        <div id="demo_div" style={{ display: 'none' }}>
-                                            <Player src={this.state.temp_video}></Player>
+                                        <div id="demo_div" style={{ display: 'block' }}>
+                                            <Player id="challengerPreviewVideo" src={this.state.temp_video}></Player>
                                         </div>
                                     </div>
                                 </form>

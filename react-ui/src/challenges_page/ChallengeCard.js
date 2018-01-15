@@ -1,75 +1,43 @@
-/**
- * Card containers for the challenge page.
- * A person who is challenged, their video will appear on the left. 
- * The person who was the one to challenge the Original User, his video will show on the right. 
- */
 import React, { Component } from 'react';
-import { Player } from 'video-react';
-import HeartButton from './HeartButton';
-import './challenges.css';
-
+import { Link } from 'react-router-dom';
+import './challenge_page.css';
 
 class ChallengeCard extends Component {
-    render() {
 
-        //The information required for the hits stats
-        const hitsInformation = this.props.hitsInformation;
-        //Get rest of the props
-        const { challengeduserName, challengedvideoDesc,
-            challengedvideoURL, challengerUniqueKey, challengeruserName,
-            challengervideoDesc, challengervideoURL, } = this.props;
-            
+    render() {
         return (
             <div>
-                <div className="container">
-                    <div className="card groupCard">
-                        {/*************************CHALLENGED******************/}
-                        <div className="row" id="challengedRow">
-                            <div className="col-md-6">
-                                <div className="challengedVideo" id="challengeVideos" >
-                                    <Player poster="" src={challengedvideoURL}></Player>
-                                </div>
+                <br />
+                <div className="card challengeCard">
+                    <div className="card-block">
+                        <div className="row">
+                            <div className="col-md-6 col-sm-6" style={{ width: 'auto' }} id="photo_row">
+                                <img src="https://s3-us-west-1.amazonaws.com/udacity-content/instructor/michael-jackson%402x-9cjdh42.jpg"
+                                    id="userPhoto" alt="Challenger" />
                             </div>
-                            <div className="col-md-6">
-                                <div id="videoInfoDiv">
-                                    <h4>{challengeduserName}</h4>
-                                    <p id="videoDescChallengePage"><i className="fa fa-quote-left"></i>{challengedvideoDesc}</p>
-                                </div>
-                                <HeartButton
-                                    challengedUniqueKey={hitsInformation.challengedUniqueKey}
-                                    challengeruserid={hitsInformation.challengeruserid}
-                                    challengerUniqueKey={challengerUniqueKey}
-                                    decider="1"
-                                    idName={hitsInformation.challengedUniqueKey + hitsInformation.challengeruserid} >
-                                </HeartButton>
-                            </div>
-
-                        </div>
-                        {/*************************CHALLENGER******************/}
-                        <div className="row" id="challengerRow">
-                            <div className="col-md-6">
-                                <div id="videoInfoDiv">
-                                    <h4>{challengeruserName}</h4>
-                                    <p id="videoDescChallengePage"><i className="fa fa-quote-left"></i>{challengervideoDesc}</p>
-                                </div>
-                                <HeartButton
-                                    challengedUniqueKey={hitsInformation.challengedUniqueKey}
-                                    challengeruserid={hitsInformation.challengeruserid}
-                                    challengerUniqueKey={challengerUniqueKey}
-                                    decider="2"
-                                    idName={hitsInformation.challengeruserid + hitsInformation.challengedUniqueKey}>
-                                </HeartButton>
-                            </div>
-                            <div className="col-md-6">
-                                <div className="challengerVideo" id="challengeVideos">
-                                    <Player className="videoChallenge" poster="" src={challengervideoURL}></Player>
-                                </div>
+                            <div className="col-md-6 col-sm-6" style={{ width: 'auto' }} id="photo_row">
+                                <img src="https://s3-us-west-1.amazonaws.com/udacity-content/instructor/ryan-florence%402x-9iqlwid.jpg"
+                                    id="userPhoto" alt="Challenger" />
                             </div>
                         </div>
-                    </div >
+                        <br />
+                        <div className="challengers">
+                            <h4 id="challenger">Wade Wilson</h4>
+                            <p id="videoName">Deadpool's Greatest fight scene ever recorded on tape!</p>
+                            <img src="https://firebasestorage.googleapis.com/v0/b/challengemetest-ea2e0.appspot.com/o/line_with_bolt.png?alt=media&token=e1e42f59-ea6b-460b-93ab-5a7d9c4e1037"
+                                id="challenger_line" alt="challenger_line" />
+                            <h4 id="challenger">Bruce Wayne</h4>
+                            <p id="videoName">Batman's greatest fight scene!</p>
+                        </div>
+                    </div>
+                    <div className="card-footer">
+                        <Link to={`/challenge/$challengeid`}>
+                            <i className="fas fa-plus"></i> Show Challenge
+                        </Link>
+                    </div>
                 </div>
             </div>
-        );
+        )
     }
 }
 

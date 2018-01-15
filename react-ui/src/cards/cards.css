@@ -1,8 +1,6 @@
 .card{
 	transition: 0.5s;
-	box-shadow: none;
 	margin-top: 10px;
-	max-width: 1000px;
 	overflow-y: auto;
 	overflow-x: hidden;
 	margin-right: auto; margin-left: auto;
@@ -16,34 +14,32 @@
 }
 
 #generalCard{
-	width: 525px;
+	min-width: 300px;
 	max-height: 900px;
+	max-width: 500px;
 	overflow-y: visible;
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 #singleVideoContainer{
 	min-height: 550px;
 	overflow-y: visible;
-	padding: 3px;
 	margin-bottom: 10px;
 	margin-top: 10px;
-	border-radius: 5px;	
 }
 
-
-
 #singleCardProfilePic{
-	height: 100px;
-	width: 85px;
-	border-radius: 40%;
+	height: 2rem;
+	max-width:2rem;
+	border-radius: 50%;
+	box-shadow: 8px 10px 20px 0px rgba(46,61,73,0.15);
 }
 /**BLOCK_Quote_DESC**/
 blockquote {
 	background:white;
-	border-left: 2px solid red;
+	/*border-left: 2px solid red;*/
 	padding: 0.5em;
-	background-color: lightgray;
-	box-shadow:  0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	background-color: white;
+	box-shadow: 0px 2px red;
   }
   blockquote p {
 	display: inline;
@@ -52,6 +48,10 @@ blockquote {
 #videoUserName{
 	float: right;
 	font-size: 15px;
+}
+#picCol{
+	float: left;
+	margin-top:5px;
 }
 
 
@@ -89,5 +89,5 @@ blockquote {
 }
 
 #social_button_box:hover{
-	box-shadow: 0 3px 0px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 1px 0px red;
 }

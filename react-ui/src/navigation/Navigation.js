@@ -53,7 +53,7 @@ export default class Navigationbar extends Component {
             <Router>
 
                 <nav className="navbar navbar-expand-lg sticky-top" id="main_nav">
-                    <a className="navbar-brand" href="Hometrend"><img alt="Logo" src={Keys.navbar_brand} width="30" height="30" /></a>
+                    <a className="navbar-brand" href="/"><img alt="Logo" src={Keys.navbar_brand} width="30" height="30" /></a>
                     <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavBar" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <i className="fas fa-chevron-circle-down" id="navbar_toggler"></i>
                     </button>

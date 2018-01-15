@@ -4,9 +4,6 @@
  * ID and visitor tag will be passed in as props 
  * ID will either be in link or PROPS. 
  * 
- * If the userid on the this.props.match.params.userId is not the same as the currently logged in UserId,
- * then take it's a visitor. Else, show him the profile. 
- * If the CUStOMIZE prop is true then that means the user came here by clicking on Login Navigation Link -- He's the OWNER
  */
 
 import React, { Component } from 'react';
@@ -17,8 +14,6 @@ require('firebase/firestore');
 var firebase = require('firebase');
 
 //const database = firebaseApp.database();
-var userid;
-
 var db = firebase.firestore();
 
 class Profilepage extends Component {
@@ -40,7 +35,6 @@ class Profilepage extends Component {
             if (user) {
                 const userRef = db.collection('users').doc(user.email);
                 userRef.get().then(function (doc) {
-
                     if (doc && doc.exists) {
                         //Compare the nickname to the active user's nickname 
 
@@ -81,7 +75,7 @@ class Profilepage extends Component {
             if (this.state.visitorNickname === '') {
                 return (
                     <div className="container">
-                        <i id="loading_icon" className="fas fa-code"></i>
+                        <p id="loading_icon">| |</p>
                     </div>
                 );
             }
@@ -90,7 +84,8 @@ class Profilepage extends Component {
             <div>
                 <Profilecard profileNickname={this.state.profileNickname}
                     visitorBoolean={this.state.visitorBoolean} visitorNickname={this.state.visitorNickname} />
-                <CardContainer userId={userid} customize={true} visitorBoolean={this.state.visitorBoolean} visitorNickname={this.state.visitorNickname}
+                <CardContainer customize={true} profileNickname={this.state.profileNickname}
+                    visitorBoolean={this.state.visitorBoolean} visitorNickname={this.state.visitorNickname}
                 />
             </div>
         );

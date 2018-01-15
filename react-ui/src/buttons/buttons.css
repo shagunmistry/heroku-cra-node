@@ -12,22 +12,25 @@
 	color: red;
 	transition: all 0.2s ease 0s;		
 }
-/********************************************************Upload Video Card Page***********************/
-.uploadCard{
+/********************************************************Upload Video Card***********************/
+.challengeUploadCard{
 	margin-right: auto;
 	margin-left: auto;
-	width: 55rem;
-	background-color: white !important;
 	text-align: left;
-	max-height: 100%;
+	max-height:700px;
+	min-height:auto;
 }
 #dropZzone{
 	height: 100px !important;
-	width: 100% !important;
+	width: 90% !important;
 	border: 1px solid red !important;
-	border-radius: 5%;
 }
 #challengeDescription{
 	max-height: 1000px;
 	max-width: 100%;
+}
+#challengerPreviewVideo{
+	max-height: 300px;
+	min-height: 100px;
+	width: 100%;
 }

@@ -79,7 +79,7 @@ class SingleCardContainer extends Component {
         return (
             <div className="container">
                 <div className="card" id="generalCard">
-                    <div className="card-text">
+                    <div className="card-block">
                         <div className="singleVideoContainer">
                             <h3>{videoTitle}</h3>
                             <Player poster="" src={videoURL}></Player>
@@ -98,6 +98,7 @@ class SingleCardContainer extends Component {
                                             profilePicURL={this.state.activeProfilePic} activeUserEmail={this.state.activeUserEmail}
                                             activeUserName={this.state.activeUserName} activeNickname={this.state.activeNickname}
                                             videoID={this.props.videoID} uploaderNickname={this.props.nickname} eachKey={this.props.eachKey}
+                                            videoTitle={videoTitle}
                                         />
                                     </div>
                                     <div className="col span_3_of_3" id='social_button_box'>
@@ -108,23 +109,23 @@ class SingleCardContainer extends Component {
                                         />
                                     </div>
                                 </div>
-                                <div className="row">
-                                    <div className="col-md-3">
-                                        <Link to={`/users/${nickname}`} >
-                                            <img alt={nickname} id="singleCardProfilePic" src={this.state.profilePicURL} />
-                                        </Link>
-                                    </div>
-                                    <div className="col-md-9">
-                                        <blockquote><p>{videoDesc}</p></blockquote>
-                                        <p id="videoUserName">By {nickname}</p>
-                                    </div>
+                                {//  <div className="row"> 
+                                }
+                                <div id="picCol">
+                                    <Link to={`/users/${nickname}`} >
+                                        <img alt={nickname} id="singleCardProfilePic" src={this.state.profilePicURL} />
+                                    </Link>
+                                </div>
+                                <div >
+                                    <blockquote><p>{videoDesc}</p></blockquote>
+                                    <p id="videoUserName">By <Link to={`/users/${nickname}`} >{nickname}</Link></p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     { /*** COMMENT SECTION ***********/}
                 </div>
-            </div>
+            </div >
 
         );
     }

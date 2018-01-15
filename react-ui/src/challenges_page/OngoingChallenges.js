@@ -3,8 +3,12 @@
  */
 
 import React, { Component } from 'react';
-import ChallengeCard from './ChallengeCard';
+//import ChallengeCard from './ChallengeCard';
 import firebaseApp from '../firebase/Firebase';
+import ChallengeCard from './ChallengeCard'
+
+
+import './challenge_page.css';
 
 var databaseRef = firebaseApp.database();
 var userInfo = {}, hitsInfo = {}, hitsArray = [];
@@ -95,17 +99,18 @@ class OngoingChallenges extends Component {
 
         var arrayToPass = this.state.arrayOfChallengeData;
         return (
-         /*   <div>
-                {
-                    arrayToPass.map((data, i) => <ChallengeCard {...data} key={data.challengerUniqueKey + i}
-                        hitsInformation={hitsArray[i]}
-                    />)
-                }
-            </div> */
+            /*   <div>
+                   {
+                       arrayToPass.map((data, i) => <ChallengeCard {...data} key={data.challengerUniqueKey + i}
+                           hitsInformation={hitsArray[i]}
+                       />)
+                   }
+               </div> */
             <div>
-                <div className="card">
-                    <h3> Coming Soon.... </h3>
-                </div>
+                <ChallengeCard />
+                <ChallengeCard />
+                <ChallengeCard />
+                <ChallengeCard />
             </div>
         )
 

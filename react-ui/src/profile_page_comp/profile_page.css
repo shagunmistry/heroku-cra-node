@@ -1,16 +1,16 @@
 /******************************************NEW _ PROFILE _ PAGE ********************************/
 #profile_pic{
-	max-width: 150px;
-	max-height: 200px;
-    margin:10px;
-    border-radius: 200px;
+    height:6rem;
+    width:6rem;
+    border-radius: 50%;
+    box-shadow: 8px 10px 20px 0px rgba(46,61,73,0.15);
+    margin-top: 5px;
 }
 #profile_card{
 	margin-right: auto;
 	margin-left: auto;
-    box-shadow:2px 2px 7px lightgray;
-	max-width: 800px;
-    background-color: white;    
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    max-width: 800px;
 }
 #test_row{
 	text-align: left;	padding-left:30px; margin-bottom: 3px;
@@ -18,14 +18,10 @@
 
 @media screen and (max-width: 994px) {
 	#profile_card{
-		max-width: 400px;
-        min-width: 400px;
+		max-width: auto;
+        min-width: auto;
         text-align: center;
 	}
-	#profile_pic{
-        max-width: 200px;
-        height: 150px;
-    }
     #test_row{
         text-align: center;
         padding-left: 0px;
@@ -44,9 +40,8 @@
     margin-top: 10%;  
     -webkit-animation: rotation 2s infinite linear;
     color: red;
-    font-size: 2em;
+    font-size: 1em;
     border-radius: 10%;
-    border: 1px solid red;
 }
 
 @-webkit-keyframes rotation {
