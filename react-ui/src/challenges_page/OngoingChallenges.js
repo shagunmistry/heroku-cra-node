@@ -34,7 +34,7 @@ class OngoingChallenges extends Component {
      */
     componentWillMount() {
         //Get the data
-        var referThis = this;
+        //var referThis = this;
         var videosRef = databaseRef.ref('challenges');
 
         //Read the challenges once
@@ -81,9 +81,9 @@ class OngoingChallenges extends Component {
                 }).then(function (onResolve) {
                     //Set the state to the arrayOfChallengeData after you push userInfo to userArray;
                     userArray.push(userInfo);
-                    referThis.setState({
+                  /*  referThis.setState({
                         arrayOfChallengeData: userArray
-                    });
+                    });*/
                     //Empty it out so the next information can set in.
                     userInfo = {};
                 });
@@ -97,7 +97,7 @@ class OngoingChallenges extends Component {
 
     render() {
 
-        var arrayToPass = this.state.arrayOfChallengeData;
+        //var arrayToPass = this.state.arrayOfChallengeData;
         return (
             /*   <div>
                    {

@@ -11,7 +11,7 @@ require('firebase/firestore');
 var firebase = require('firebase');
 var db = firebase.firestore();
 
-var storageRef = firebaseApp.storage().ref(), databaseRef = firebaseApp.database();
+var storageRef = firebaseApp.storage().ref();// databaseRef = firebaseApp.database();
 
 
 
@@ -47,7 +47,7 @@ class SocialButtonComponent extends Component {
     }
 
     componentDidMount() {
-        var key = this.props.uniqueKey, referThis = this;
+        var  referThis = this;//key = this.props.uniqueKey,
 
         //Go to the database under STATS/ and use the key to get all the information. 
         const getStatsRef = db.collection('all_videos').doc(this.props.videoID);
