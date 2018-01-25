@@ -4,14 +4,15 @@
 
 import React, { Component } from 'react';
 //import ChallengeCard from './ChallengeCard';
-import firebaseApp from '../firebase/Firebase';
+//import firebaseApp from '../firebase/Firebase';
 import ChallengeCard from './ChallengeCard'
-
-
 import './challenge_page.css';
+require('firebase/firestore');
+var firebase = require('firebase');
+var db = firebase.firestore();
 
-var databaseRef = firebaseApp.database();
-var userInfo = {}, hitsInfo = {}, hitsArray = [];
+//var databaseRef = firebaseApp.database();
+var userInfo = {};
 var userArray = [];
 
 class OngoingChallenges extends Component {
@@ -35,82 +36,49 @@ class OngoingChallenges extends Component {
     componentWillMount() {
         //Get the data
         //var referThis = this;
-        var videosRef = databaseRef.ref('challenges');
+        let videoRef = db.collection('challenges'), referThis = this;
 
-        //Read the challenges once
-        videosRef.once('value').then(function (snapshot) {
-            snapshot.forEach(function (challengesData) {
+        videoRef.get().then(function (snap) {
+            snap.forEach(function (eachVideo) {
+                //This is all the information we need for this page. When we actually pull up the challenge,
+                //we can use the nickname + videoTitle to pull up the videos. 
                 userInfo = {};
-                //Get the person CHALLENGED's unique Key
-                userInfo.challengedUniqueKey = challengesData.key;
-                hitsInfo.challengedUniqueKey = challengesData.key;
-
-                challengesData.forEach(function (eachChallenge) {
-                    //Get Each Challenge's HITS, uniqueKeys
-                    userInfo.challengerUniqueKey = eachChallenge.val().challengerUniqueKey;
-
-                    hitsInfo.challengedHits = eachChallenge.val().challengedHits;
-                    hitsInfo.challengerHits = eachChallenge.val().challengerHits;
-                    hitsInfo.challengeruserid = eachChallenge.key;
-                    hitsArray.push(hitsInfo);
-                });
-
-                //console.log(hitsArray[0]);
-                //The data is different right now. 
-                //Get the challenger's Information 
-                databaseRef.ref('posts/' + userInfo.challengerUniqueKey).once('value').then(function (challengerSnapshot) {
-
-                    userInfo.challengerProfilePic = challengerSnapshot.val().profilePic;
-                    userInfo.challengeruserName = challengerSnapshot.val().userName;
-                    userInfo.challengervideoDesc = challengerSnapshot.val().videoDesc;
-                    userInfo.challengervideoTitle = challengerSnapshot.val().videoTitle;
-                    userInfo.challengervideoURL = challengerSnapshot.val().videoURL;
-                    userInfo.challengeruserid = challengerSnapshot.val().userid;
-                    //console.log("A: " + userInfo.challengervideoDesc);
-                });
-
-                databaseRef.ref('posts/' + userInfo.challengedUniqueKey).once('value').then(function (challengedSnapShot) {
-                    userInfo.challengedProfilePic = challengedSnapShot.val().profilePic;
-                    userInfo.challengeduserName = challengedSnapShot.val().userName;
-                    userInfo.challengedvideoDesc = challengedSnapShot.val().videoDesc;
-                    userInfo.challengedvideoTitle = challengedSnapShot.val().videoTitle;
-                    userInfo.challengedvideoURL = challengedSnapShot.val().videoURL;
-                    userInfo.challengeduserid = challengedSnapShot.val().userid;
-                    //console.log("B: " + userInfo.challengedvideoDesc);
-
-                }).then(function (onResolve) {
-                    //Set the state to the arrayOfChallengeData after you push userInfo to userArray;
-                    userArray.push(userInfo);
-                  /*  referThis.setState({
-                        arrayOfChallengeData: userArray
-                    });*/
-                    //Empty it out so the next information can set in.
-                    userInfo = {};
-                });
-
-                hitsInfo = {};
+                userInfo.challenged = eachVideo.data().challenged;
+                userInfo.challenger = eachVideo.data().challenger;
+                userInfo.challengedVideoTitle = eachVideo.data().challengedVideoTitle;
+                userInfo.challengerVideoTitle = eachVideo.data().challengerVideoTitle;
+                userInfo.challengerVotes = eachVideo.data().challengerVotes;
+                userInfo.challengedVotes = eachVideo.data().challengedVotes;
+                userArray.push(userInfo);
+                userInfo = {};
             });
+        }).then(function () {
+            //On Success
+            referThis.setState({
+                arrayOfChallengeData: userArray
+            });
+            userArray = [];
         });
+
+
 
     }
 
 
     render() {
 
-        //var arrayToPass = this.state.arrayOfChallengeData;
+        var arrayToPass = this.state.arrayOfChallengeData;
         return (
-            /*   <div>
-                   {
-                       arrayToPass.map((data, i) => <ChallengeCard {...data} key={data.challengerUniqueKey + i}
-                           hitsInformation={hitsArray[i]}
-                       />)
-                   }
-               </div> */
             <div>
-                <ChallengeCard />
-                <ChallengeCard />
-                <ChallengeCard />
-                <ChallengeCard />
+                {
+                    arrayToPass.map((data, i) => <ChallengeCard {...data} key={data.nickname + i} />)
+                    /*  < ChallengeCard />
+                      <ChallengeCard />
+                      <ChallengeCard />
+                      <ChallengeCard /> */
+                }
+
+
             </div>
         )
 

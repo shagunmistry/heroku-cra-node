@@ -473,7 +473,7 @@ class SocialButtonComponent extends Component {
                     <Modal ref="denyModal" modalStyle={{ width: 'auto' }}>
                         <div className="card">
                             <h3 className="card-header">Please log in to like</h3>
-                            <a className="card-text" style={{ color: 'blue', textAlign: 'center' }} href="/ProfileCheck"><h4>Login Here</h4></a>
+                            <a className="card-text" style={{ color: 'blue', textAlign: 'center' }} href="/check_user_status"><h4>Login Here</h4></a>
                         </div>
                     </Modal>
                 </div>
@@ -487,7 +487,7 @@ class SocialButtonComponent extends Component {
                     <Modal ref="denyModal" modalStyle={{ width: 'auto' }}>
                         <div className="card">
                             <h3 className="card-header">Please log in to challenge</h3>
-                            <a className="card-text" style={{ color: 'blue', textAlign: 'center' }} href="/ProfileCheck"><h4>Login Here</h4></a>
+                            <a className="card-text" style={{ color: 'blue', textAlign: 'center' }} href="/check_user_status"><h4>Login Here</h4></a>
                         </div>
                     </Modal>
                     <Modal ref="modal" modalStyle={modalStyle}>
@@ -537,7 +537,7 @@ class SocialButtonComponent extends Component {
                     <Modal ref="denyModal" modalStyle={{ width: 'auto' }}>
                         <div className="card">
                             <h3 className="card-header">Please log in to dislike</h3>
-                            <a className="card-text" style={{ color: 'blue', textAlign: 'center' }} href="/ProfileCheck"><h4>Login Here</h4></a>
+                            <a className="card-text" style={{ color: 'blue', textAlign: 'center' }} href="/check_user_status"><h4>Login Here</h4></a>
                         </div>
                     </Modal>
                 </div>

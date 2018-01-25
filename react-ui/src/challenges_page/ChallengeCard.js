@@ -5,6 +5,7 @@ import './challenge_page.css';
 class ChallengeCard extends Component {
 
     render() {
+        const { challenged, challenger, challengedVotes, challengerVotes, challengerVideoTitle, challengedVideoTitle } = this.props;
         return (
             <div>
                 <br />
@@ -22,12 +23,12 @@ class ChallengeCard extends Component {
                         </div>
                         <br />
                         <div className="challengers">
-                            <h4 id="challenger">Wade Wilson</h4>
-                            <p id="videoName">Deadpool's Greatest fight scene ever recorded on tape!</p>
+                            <h4 id="challenger">{challenger}</h4>
+                            <p id="videoName">{challengerVideoTitle}</p>
                             <img src="https://firebasestorage.googleapis.com/v0/b/challengemetest-ea2e0.appspot.com/o/line_with_bolt.png?alt=media&token=e1e42f59-ea6b-460b-93ab-5a7d9c4e1037"
                                 id="challenger_line" alt="challenger_line" />
-                            <h4 id="challenger">Bruce Wayne</h4>
-                            <p id="videoName">Batman's greatest fight scene!</p>
+                            <h4 id="challenger">{challenged}</h4>
+                            <p id="videoName">{challengedVideoTitle}</p>
                         </div>
                     </div>
                     <div className="card-footer">
