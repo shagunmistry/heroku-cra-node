@@ -9,6 +9,7 @@ import EditProfile from '../profile_page_comp/EditProfile';
 import UploadVideo from '../uploadPage/UploadVideo';
 import FollowersPage from '../profile_stats/FollowersPage';
 import ChallengePage from '../challenges_page/ChallengePage';
+import Comments from '../comment/Comments';
 
 import firebaseApp from '../firebase/Firebase';
 
@@ -72,6 +73,7 @@ class App extends Component {
             <Route exact path="/EditProfile" component={EditProfile} />
             <Route exact path="/Upload" component={UploadVideo} />
             <Route exact path="/stats" component={FollowersPage} />
+            <Route path="/videos/:videoid" component={Comments} />
           </div>
         </Router>
       </div>

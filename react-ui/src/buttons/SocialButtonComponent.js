@@ -47,7 +47,7 @@ class SocialButtonComponent extends Component {
     }
 
     componentDidMount() {
-        var  referThis = this;//key = this.props.uniqueKey,
+        var referThis = this;//key = this.props.uniqueKey,
 
         //Go to the database under STATS/ and use the key to get all the information. 
         const getStatsRef = db.collection('all_videos').doc(this.props.videoID);
@@ -357,7 +357,7 @@ class SocialButtonComponent extends Component {
                 const downloadURL = uploadTask.snapshot.downloadURL;
                 //Submit the info to Firestore
                 var video_doc_ref = db.collection('videos').doc(referThis.props.activeNickname).collection(random_title).doc('video_info');
-                var challenge_ref = db.collection('challenges').doc(referThis.props.uploaderNickname + '_' + referThis.props.activeNickname);
+                var challenge_ref = db.collection('challenges').doc(referThis.props.uploaderNickname + '_' + referThis.props.activeNickname + '_' + referThis.randomString());
                 //console.log('New Document ID: ' + video_doc_ref.id);
                 video_doc_ref.set({
                     title: title,
@@ -385,7 +385,7 @@ class SocialButtonComponent extends Component {
                     }, { merge: true }).then(function () {
                         //Success uploading the data
                         document.getElementById('submitButton').innerText = "Upload Success!";
-                        window.location.replace('/check_user_status');
+                        //window.location.replace('/check_user_status');
                     }).then(function () {
                         //Commit the Challngers Video. 
                         challenge_ref.set({
@@ -394,11 +394,16 @@ class SocialButtonComponent extends Component {
                             challengerVotes: 0,
                             challengedVotes: 0,
                             challengerVideoTitle: title,
-                            challengedVideoTitle: referThis.props.videoTitle
+                            challengedVideoTitle: referThis.props.videoTitle,
+                            challengedVideoURL: referThis.props.challengedVideoURL,
+                            challengerVideoURL: downloadURL
                         }, { merge: true });
+
                         let temp_ref = storageRef.child('users/' + referThis.state.activeNickname + '/temp_video/temp_video_file');
                         temp_ref.delete();
-
+                    }).then(function () {
+                        //After challenge is uploaded, go to the challenge's page. 
+                        window.location.replace('/challenge/' + referThis.props.uploaderNickname + '_' + referThis.props.activeNickname + '_' + referThis.randomString());
                     });
                 }).catch(function (error) {
                     document.getElementById('submitButton').innerText = "Error uploading";

@@ -43,15 +43,19 @@ class OngoingChallenges extends Component {
                 //This is all the information we need for this page. When we actually pull up the challenge,
                 //we can use the nickname + videoTitle to pull up the videos. 
                 userInfo = {};
+
                 userInfo.challenged = eachVideo.data().challenged;
                 userInfo.challenger = eachVideo.data().challenger;
+                userInfo.challengeID = eachVideo.id;
                 userInfo.challengedVideoTitle = eachVideo.data().challengedVideoTitle;
                 userInfo.challengerVideoTitle = eachVideo.data().challengerVideoTitle;
                 userInfo.challengerVotes = eachVideo.data().challengerVotes;
                 userInfo.challengedVotes = eachVideo.data().challengedVotes;
+
                 userArray.push(userInfo);
                 userInfo = {};
             });
+
         }).then(function () {
             //On Success
             referThis.setState({
@@ -59,11 +63,7 @@ class OngoingChallenges extends Component {
             });
             userArray = [];
         });
-
-
-
     }
-
 
     render() {
 
@@ -71,7 +71,7 @@ class OngoingChallenges extends Component {
         return (
             <div>
                 {
-                    arrayToPass.map((data, i) => <ChallengeCard {...data} key={data.nickname + i} />)
+                    arrayToPass.map((data, i) => <ChallengeCard {...data} key={data.challengeID + i} />)
                     /*  < ChallengeCard />
                       <ChallengeCard />
                       <ChallengeCard />

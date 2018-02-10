@@ -39,7 +39,7 @@ class CardContainer extends Component {
         //Only for homepage 
         if (!this.props.customize) {
             //Go to the collection
-            const videoRef = db.collection('all_videos');
+            const videoRef = db.collection('all_videos').orderBy("likes", "desc");
             videoRef.get().then(function (querySnap) {
                 querySnap.forEach(function (eachVideo) {
                     userInfo.videoURL = eachVideo.data().videoURL;

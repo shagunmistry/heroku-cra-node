@@ -22,6 +22,7 @@ class EditProfile extends Component {
             profilePic: "",
             userEmail: '',
             pictureFile: [],
+            nickname: ''
         }
         this.changePic = this.changePic.bind(this);
         this.submitChanges = this.submitChanges.bind(this);
@@ -47,11 +48,12 @@ class EditProfile extends Component {
                             username: snap.data().name,
                             userEmail: snap.data().userEmail,
                             profilePic: snap.data().profilePic,
-                            userUID: user.uid
+                            userUID: user.uid,
+                            nickname: snap.data().nickname
                         });
 
                         //change the values of the input boxes
-                        document.getElementById('aboutInput').innerText = snap.data().about || "";
+                        document.getElementById('aboutInput').value = snap.data().about || "";
                         document.getElementById('taglineInput').value = snap.data().tagline || "";
                         document.getElementById('facebookLinkInput').value = snap.data().facebook || "";
                         document.getElementById('linkedInLinkInput').value = snap.data().linkedin || "";
@@ -82,7 +84,7 @@ class EditProfile extends Component {
             this.setState({ pictureFile });
 
             //get the reference to the storage area 
-            var imageRef = defStorageRef.child('users/' + referThis.state.userUID + '/images/' + this.state.pictureFile[0].name);
+            var imageRef = defStorageRef.child('users/' + referThis.state.nickname + '/profile_pictures/' + this.state.pictureFile[0].name);
             //now upload the file to the storage. 
             var uploadTask = imageRef.put(this.state.pictureFile[0]);
             uploadTask.on('state_changed', function (snapshot) {

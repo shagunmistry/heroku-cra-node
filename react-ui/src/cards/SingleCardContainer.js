@@ -98,7 +98,7 @@ class SingleCardContainer extends Component {
                                             profilePicURL={this.state.activeProfilePic} activeUserEmail={this.state.activeUserEmail}
                                             activeUserName={this.state.activeUserName} activeNickname={this.state.activeNickname}
                                             videoID={this.props.videoID} uploaderNickname={this.props.nickname} eachKey={this.props.eachKey}
-                                            videoTitle={videoTitle}
+                                            videoTitle={videoTitle} challengedVideoURL={videoURL}
                                         />
                                     </div>
                                     <div className="col span_3_of_3" id='social_button_box'>
@@ -123,7 +123,11 @@ class SingleCardContainer extends Component {
                             </div>
                         </div>
                     </div>
-                    { /*** COMMENT SECTION ***********/}
+                    <div id="commentsLink" style={{ textAlign: 'left', marginLeft: '10px' }}>
+                        <Link to={`/videos/${this.props.videoID}`}>
+                            <i className="far fa-comments"></i> Comments
+                        </Link>
+                    </div>
                 </div>
             </div >
 

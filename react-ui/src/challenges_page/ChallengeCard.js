@@ -1,11 +1,51 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import './challenge_page.css';
+require('firebase/firestore');
+
+
+var firebase = require('firebase');
+var db = firebase.firestore();
 
 class ChallengeCard extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            challengerProfilePic: '',
+            challengedProfilePic: ''
+        };
+    };
+
+    componentWillMount() {
+
+        let challengedEmail = "", challengerEmail = "", referThis = this;
+    
+        //Get the Challenged's email address
+        db.collection('nicknames').doc(this.props.challenged).get().then(function (challengedSnap) {
+            challengedEmail = challengedSnap.data().email;
+            //get the profile picture. 
+            db.collection('users').doc(challengedEmail).get().then(function (profile) {
+                referThis.setState({
+                    challengedProfilePic: profile.data().profilePic
+                });
+            });
+        });
+
+        //get the challenger's email address
+        db.collection('nicknames').doc(this.props.challenger).get().then(function (challengerSnap) {
+            challengerEmail = challengerSnap.data().email;
+            //get the profile picture. 
+            db.collection('users').doc(challengerEmail).get().then(function (challengerProfile) {
+                referThis.setState({
+                    challengerProfilePic: challengerProfile.data().profilePic
+                });
+            });
+        });
+    }
 
     render() {
-        const { challenged, challenger, challengedVotes, challengerVotes, challengerVideoTitle, challengedVideoTitle } = this.props;
+        const { challenged, challenger,/* challengedVotes, challengerVotes,*/ challengerVideoTitle,
+            challengedVideoTitle } = this.props;
         return (
             <div>
                 <br />
@@ -13,12 +53,12 @@ class ChallengeCard extends Component {
                     <div className="card-block">
                         <div className="row">
                             <div className="col-md-6 col-sm-6" style={{ width: 'auto' }} id="photo_row">
-                                <img src="https://s3-us-west-1.amazonaws.com/udacity-content/instructor/michael-jackson%402x-9cjdh42.jpg"
-                                    id="userPhoto" alt="Challenger" />
+                                <img src={this.state.challengerProfilePic}
+                                    id="userPhoto" alt={challenger} />
                             </div>
                             <div className="col-md-6 col-sm-6" style={{ width: 'auto' }} id="photo_row">
-                                <img src="https://s3-us-west-1.amazonaws.com/udacity-content/instructor/ryan-florence%402x-9iqlwid.jpg"
-                                    id="userPhoto" alt="Challenger" />
+                                <img src={this.state.challengedProfilePic}
+                                    id="userPhoto" alt={challenged} />
                             </div>
                         </div>
                         <br />
@@ -32,7 +72,7 @@ class ChallengeCard extends Component {
                         </div>
                     </div>
                     <div className="card-footer">
-                        <Link to={`/challenge/$challengeid`}>
+                        <Link to={`/challenge/${this.props.challengeID}`}>
                             <i className="fas fa-plus"></i> Show Challenge
                         </Link>
                     </div>
