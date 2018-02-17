@@ -10,14 +10,14 @@ class EachComment extends Component {
 
     render() {
         return (
-            <section>
+            <section id="eachCommentsSection" className="container">
                 <div id="picCol">
                     <Link to={`/users/$someone`} >
-                        <img alt="Someone" id="singleCardProfilePic" src='https://firebasestorage.googleapis.com/v0/b/challengemetest-ea2e0.appspot.com/o/users%2FE9U2gAoOE6R57nCDhjE7txLrSxO2%2Fimages%2Fbatman.jpg?alt=media&token=7811677b-89d0-4990-b5c1-c81cde099137' />
+                        <img alt="Someone" id="singleCardProfilePic" src='https://firebasestorage.googleapis.com/v0/b/challengemetest-ea2e0.appspot.com/o/users%2Fshagunmistry%2Fprofile_pictures%2FProfile_pic_2.jpeg?alt=media&token=be420f75-43d4-4117-91c2-403d927e1fe2' />
                     </Link>
                 </div>
                 <div id='comment_text'>
-                    <blockquote><p>This is a sample comment</p></blockquote>
+                    <p>This is a sample comment.</p>
                 </div>
             </section>
         );

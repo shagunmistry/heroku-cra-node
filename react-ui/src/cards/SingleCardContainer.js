@@ -24,6 +24,7 @@ class SingleCardContainer extends Component {
             activeUserEmail: "",
             activeNickname: "",
             profilePicURL: "",
+            commentsPage: this.props.commentsPage ? 'none' : 'block'
         });
 
         this.loadProfilePic = this.loadProfilePic.bind(this);
@@ -41,7 +42,7 @@ class SingleCardContainer extends Component {
             if (user) {
                 const activeProfileRef = db.collection('users').doc(user.email);
                 activeProfileRef.get().then(function (activeSnapshot) {
-                    console.log(activeSnapshot.data().nickname);
+                    //console.log(activeSnapshot.data().nickname);
                     referThis.setState({
                         activeProfilePic: activeSnapshot.data().profilePic,
                         activeUser: true,
@@ -65,6 +66,7 @@ class SingleCardContainer extends Component {
     loadProfilePic() {
         let referThis = this;
         //Use the user's email to access their profile pic info. 
+        console.log(this.props);
         const prof_ref = db.collection('users').doc(this.props.email);
         prof_ref.get().then(function (querySnap) {
             referThis.setState({
@@ -123,7 +125,7 @@ class SingleCardContainer extends Component {
                             </div>
                         </div>
                     </div>
-                    <div id="commentsLink" style={{ textAlign: 'left', marginLeft: '10px' }}>
+                    <div id="commentsLink" style={{ textAlign: 'left', marginLeft: '10px', display: this.state.commentsPage }}>
                         <Link to={`/videos/${this.props.videoID}`}>
                             <i className="far fa-comments"></i> Comments
                         </Link>
